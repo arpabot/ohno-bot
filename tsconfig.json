@@ -1,0 +1,12 @@
+{
+  "compileOnSave": true,
+  "include": ["src/**/*"],
+  "extends": ["@tsconfig/strictest/tsconfig", "@tsconfig/node20/tsconfig"],
+  "compilerOptions": {
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "target": "ESNext",
+    "moduleResolution": "nodenext",
+    "module": "ESNext"
+  },
+}

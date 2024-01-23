@@ -1,0 +1,24 @@
+import { SlashCommandBuilder } from "@discordjs/builders";
+import {
+  API,
+  APIInteraction,
+  MessageFlags,
+  RESTPostAPIChatInputApplicationCommandsJSONBody,
+} from "@discordjs/core";
+import { type ICommand } from "./index.js";
+
+export default class Ping implements ICommand {
+  defition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
+    return new SlashCommandBuilder()
+      .setName("ping")
+      .setDescription("Ping Pong")
+      .toJSON();
+  }
+
+  async run(api: API, i: APIInteraction): Promise<unknown> {
+    return await api.interactions.editReply(i.application_id, i.token, {
+      content: "Pong!",
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+}

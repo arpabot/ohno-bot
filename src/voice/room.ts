@@ -1,3 +1,4 @@
+import { Readable } from "stream";
 import { API, APIMessage } from "@discordjs/core";
 import {
   VoiceConnection,
@@ -61,7 +62,12 @@ export default class Room {
         userConfig?.speed ?? 1,
       );
       const resource = createAudioResource(
-        except(await synthesizer.synthesis(message.content)),
+        Readable.fromWeb(
+          (await synthesizer.synthesis(message.content)) ||
+            (() => {
+              throw "fuck";
+            })(),
+        ),
       );
 
       this.audioPlayer.play(resource);

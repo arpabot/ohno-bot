@@ -29,3 +29,5 @@ for (const [event, fn] of Object.entries(handlers)) {
 }
 
 await gateway.connect();
+
+export { gateway };

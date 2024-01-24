@@ -15,9 +15,6 @@ export default async ({
 
   if (!validate(data)) return false;
 
-  members.set(data.user.id, { guild_id: data.guild_id, ...data.member });
-  users.set(data.user.id, data.user);
-
   const command = commands.find((x) => x.defition().name === data.data.name);
 
   if (!command)

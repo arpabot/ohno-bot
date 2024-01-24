@@ -5,7 +5,6 @@ import {
 } from "@discordjs/core";
 import { validate } from "../commands/helper.js";
 import { commands } from "../commands/index.js";
-import { members, users } from "../common/cache.js";
 
 export default async ({
   api,

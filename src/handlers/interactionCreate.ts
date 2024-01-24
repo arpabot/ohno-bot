@@ -5,6 +5,7 @@ import {
 } from "@discordjs/core";
 import { validate } from "../commands/helper.js";
 import { commands } from "../commands/index.js";
+import { members, users } from "../common/cache.js";
 
 export default async ({
   api,
@@ -13,6 +14,9 @@ export default async ({
   await api.interactions.defer(data.id, data.token);
 
   if (!validate(data)) return false;
+
+  members.set(data.user.id, { guild_id: data.guild_id, ...data.member });
+  users.set(data.user.id, data.user);
 
   const command = commands.find((x) => x.defition().name === data.data.name);
 

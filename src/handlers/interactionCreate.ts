@@ -10,7 +10,6 @@ export default async ({
   api,
   data,
 }: WithIntrinsicProps<GatewayInteractionCreateDispatchData>) => {
-  console.log(0);
   await api.interactions.defer(data.id, data.token);
 
   if (!validate(data)) return false;

@@ -1,6 +1,5 @@
 import {
   APIChatInputApplicationCommandInteraction,
-  APIGuildMember,
   APIInteraction,
   APIInteractionGuildMember,
   APIUser,

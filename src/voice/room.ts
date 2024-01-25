@@ -1,6 +1,7 @@
 import { Readable } from "stream";
 import { API, APIMessage } from "@discordjs/core";
 import {
+  StreamType,
   VoiceConnection,
   VoiceConnectionStatus,
   createAudioPlayer,
@@ -68,6 +69,7 @@ export default class Room {
               throw "fuck";
             })(),
         ),
+        { inputType: StreamType.Raw },
       );
 
       this.audioPlayer.play(resource);

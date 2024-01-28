@@ -1,6 +1,7 @@
 import { Client, GatewayIntentBits } from "@discordjs/core";
 import { REST } from "@discordjs/rest";
 import { WebSocketManager } from "@discordjs/ws";
+import { PrismaClient } from "@prisma/client";
 import "dotenv/config";
 import handlers from "./handlers/index.js";
 
@@ -20,6 +21,7 @@ const gateway = new WebSocketManager({
   rest,
 });
 const client = new Client({ rest, gateway });
+const prisma = new PrismaClient();
 
 for (const [event, fn] of Object.entries(handlers)) {
   client.on(
@@ -29,5 +31,7 @@ for (const [event, fn] of Object.entries(handlers)) {
 }
 
 await gateway.connect();
+await prisma.$connect();
 
 export { gateway };
+export { prisma };

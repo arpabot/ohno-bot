@@ -12,7 +12,7 @@ import {
 import { WebSocketManager } from "@discordjs/ws";
 import { Mutex } from "async-mutex";
 import { except } from "../common/functions.js";
-import { getJSON } from "../db/helper.js";
+import { prisma } from "../index.js";
 import Synthesizer from "../synthesizer/index.js";
 import voiceAdapterCreator from "./voiceAdapterCreator.js";
 
@@ -51,9 +51,9 @@ export default class Room {
     const release = await this.audioResourceLock.acquire();
 
     try {
-      const userConfig = await getJSON<Synthesizer>(
-        `synthesizers/${message.author.id}`,
-      );
+      const userConfig = await prisma.synthesizer.findFirst({
+        where: { userId: message.author.id },
+      });
       const synthesizer = new Synthesizer(
         except(process.env["key"]),
         except(process.env["region"]),

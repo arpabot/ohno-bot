@@ -45,7 +45,7 @@ export default class Synthesizer {
   toJSON() {
     return JSON.stringify({
       voice: this.voice,
-      spped: this.speed,
+      speed: this.speed,
       userId: this.userId,
       pitch: this.pitch,
     });

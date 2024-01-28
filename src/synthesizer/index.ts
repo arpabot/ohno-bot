@@ -1,4 +1,4 @@
-import { version } from "../../package.json";
+import { version } from "../common/version.js";
 
 export const voices = Object.fromEntries(
   ["Nanami", "Keita", "Aoi", "Daichi", "Mayu", "Naoki", "Shiori"].map((x) => [
@@ -21,18 +21,19 @@ export default class Synthesizer {
     return (
       await fetch(this.baseURL("v1"), {
         method: "POST",
-        body: `<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xml:lang=\"ja-JP\">\
-      <voice name=\"${this.voice}\">\
-          <prosody rate=\"${this.speed + 0.2}\">\
-            ${text}\
-          </prosody>\
-        </voice>\
-      </speak>`,
+        body: `
+<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xml:lang=\"ja-JP\">\
+  <voice name=\"${this.voice}\">\
+    <prosody rate=\"${this.speed + 0.2}\">\
+      ${text}\
+    </prosody>\
+  </voice>\
+</speak>`,
         headers: {
           "User-Agent": `OHNO/${version}`,
           "Content-Type": "application/ssml+xml",
           "Ocp-Apim-Subscription-Key": this.key,
-          "X-Microsoft-OutputFormat": "raw-48khz-16bit-mono-pcm",
+          "X-Microsoft-OutputFormat": "ogg-48khz-16bit-mono-opus",
         },
       })
     ).body;

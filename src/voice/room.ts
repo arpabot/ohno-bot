@@ -1,6 +1,7 @@
 import { Readable } from "stream";
 import { API, APIMessage } from "@discordjs/core";
 import {
+  NoSubscriberBehavior,
   StreamType,
   VoiceConnection,
   VoiceConnectionStatus,
@@ -26,17 +27,20 @@ export default class Room {
     public textChannelId: string,
     public guildId: string,
     private audioResourceLock = new Mutex(),
-    private audioPlayer = createAudioPlayer(),
+    private audioPlayer = createAudioPlayer({
+      behaviors: { noSubscriber: NoSubscriberBehavior.Play },
+    }),
   ) {
-    roomManager.set(voiceChannelId, this);
+    roomManager.set(guildId, this);
   }
 
   async connect() {
     this.connection = joinVoiceChannel({
-      adapterCreator: voiceAdapterCreator(this.voiceChannelId, this.gateway),
+      adapterCreator: voiceAdapterCreator(this.guildId, this.gateway),
       guildId: this.guildId,
       channelId: this.voiceChannelId,
     });
+    this.connection?.subscribe(this.audioPlayer);
 
     await entersState(this.connection, VoiceConnectionStatus.Ready, 10_000);
   }
@@ -44,7 +48,7 @@ export default class Room {
   async destroy() {
     this.connection?.disconnect();
     this.connection?.destroy();
-    roomManager.delete(this.voiceChannelId);
+    roomManager.delete(this.guildId);
   }
 
   async speak(message: APIMessage) {
@@ -57,11 +61,12 @@ export default class Room {
       const synthesizer = new Synthesizer(
         except(process.env["key"]),
         except(process.env["region"]),
-        userConfig?.voice ?? "",
+        userConfig?.voice ?? "ja-JP-NanamiNeural",
         message.author.id,
         userConfig?.pitch ?? 1,
         userConfig?.speed ?? 1,
       );
+
       const resource = createAudioResource(
         Readable.fromWeb(
           (await synthesizer.synthesis(message.content)) ||
@@ -69,7 +74,10 @@ export default class Room {
               throw "fuck";
             })(),
         ),
-        { inputType: StreamType.Raw },
+        {
+          inputType: StreamType.OggOpus,
+          metadata: {},
+        },
       );
 
       this.audioPlayer.play(resource);

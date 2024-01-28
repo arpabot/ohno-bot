@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "swc src --out-dir dist && node --enable-source-maps dist",
+    "build": "./scripts/beforeBuild.sh && swc src --out-dir dist && ./scripts/afterBuild.sh",
+    "start": "pnpm run build && node --enable-source-maps dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,6 +16,7 @@
     "@biomejs/biome": "1.5.2",
     "@discordjs/builders": "^1.7.0",
     "@discordjs/core": "^1.1.1",
+    "@discordjs/opus": "^0.9.0",
     "@discordjs/rest": "^2.2.0",
     "@discordjs/voice": "^0.16.1",
     "@discordjs/ws": "^1.0.2",
@@ -27,6 +29,7 @@
     "dotenv": "^16.3.2",
     "etcd3": "^1.1.2",
     "lefthook": "^1.5.7",
+    "libsodium-wrappers": "^0.7.13",
     "prisma": "^5.8.1",
     "typescript": "^5.3.3"
   },

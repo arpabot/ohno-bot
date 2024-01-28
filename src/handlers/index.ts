@@ -1,9 +1,12 @@
 import { GatewayDispatchEvents, WithIntrinsicProps } from "@discordjs/core";
+import guildCreate from "./guildCreate.js";
 import guildMemberUpdate from "./guildMemberUpdate.js";
 import guildMembersChunk from "./guildMembersChunk.js";
 import interactionCreate from "./interactionCreate.js";
 import ready from "./ready.js";
 import userUpdate from "./userUpdate.js";
+import voiceServerUpdate from "./voiceServerUpdate.js";
+import voiceStateUpdate from "./voiceStateUpdate.js";
 
 const handlers: {
   // fuck.
@@ -15,6 +18,9 @@ const handlers: {
   [GatewayDispatchEvents.GuildMemberUpdate]: guildMemberUpdate,
   [GatewayDispatchEvents.GuildMembersChunk]: guildMembersChunk,
   [GatewayDispatchEvents.UserUpdate]: userUpdate,
+  [GatewayDispatchEvents.VoiceStateUpdate]: voiceStateUpdate,
+  [GatewayDispatchEvents.VoiceServerUpdate]: voiceServerUpdate,
+  [GatewayDispatchEvents.GuildCreate]: guildCreate,
 };
 
 export default handlers;

@@ -2,15 +2,15 @@ import { GatewaySendPayload } from "@discordjs/core";
 import { DiscordGatewayAdapterLibraryMethods } from "@discordjs/voice";
 import { WebSocketManager } from "@discordjs/ws";
 
-const adapters = new Map<string, DiscordGatewayAdapterLibraryMethods>();
+export const adapters = new Map<string, DiscordGatewayAdapterLibraryMethods>();
 
 export default function voiceAdapterCreator(
-  channelId: string,
+  guildId: string,
   gateway: WebSocketManager,
 ) {
   // from: https://github.com/discordjs/discord.js/blob/bfc7bb55641c60d4d67e57c27c9d1e63b6f30c9b/packages/discord.js/src/structures/Guild.js#L1410
   return (methods: DiscordGatewayAdapterLibraryMethods) => {
-    adapters.set(channelId, methods);
+    adapters.set(guildId, methods);
 
     return {
       sendPayload: (data: GatewaySendPayload) => {
@@ -21,7 +21,7 @@ export default function voiceAdapterCreator(
         return true;
       },
       destroy: () => {
-        adapters.delete(channelId);
+        adapters.delete(guildId);
       },
     };
   };

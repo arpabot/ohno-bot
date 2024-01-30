@@ -22,7 +22,7 @@ export default class Room {
 
   constructor(
     private gateway: WebSocketManager,
-    private api: API,
+    public api: API,
     public voiceChannelId: string,
     public textChannelId: string,
     public guildId: string,

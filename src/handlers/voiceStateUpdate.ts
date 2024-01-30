@@ -4,7 +4,8 @@ import {
 } from "@discordjs/core";
 import { Mutex } from "async-mutex";
 import { voiceStates } from "../common/cache.js";
-import { except } from "../common/functions.js";
+import { __catch, except } from "../common/functions.js";
+import { roomManager } from "../voice/room.js";
 import { adapters } from "../voice/voiceAdapterCreator.js";
 
 const lock = new Mutex();
@@ -38,6 +39,19 @@ export default async ({
     ) {
       if (data.guild_id && data.session_id && data.user_id) {
         adapters.get(data.guild_id)?.onVoiceStateUpdate(data);
+        if (!data.channel_id) {
+          const room = roomManager.get(data.guild_id);
+
+          if (room) {
+            await __catch([
+              room.destroy(),
+              room.api.channels.createMessage(room.textChannelId, {
+                content:
+                  "ボイスチャンネルから切断されました。意図した挙動でないなら /join で再接続してください。",
+              }),
+            ]);
+          }
+        }
       }
     }
 

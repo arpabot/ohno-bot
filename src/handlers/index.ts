@@ -3,6 +3,7 @@ import guildCreate from "./guildCreate.js";
 import guildMemberUpdate from "./guildMemberUpdate.js";
 import guildMembersChunk from "./guildMembersChunk.js";
 import interactionCreate from "./interactionCreate.js";
+import messageCreate from "./messageCreate.js";
 import ready from "./ready.js";
 import userUpdate from "./userUpdate.js";
 import voiceServerUpdate from "./voiceServerUpdate.js";
@@ -21,6 +22,7 @@ const handlers: {
   [GatewayDispatchEvents.VoiceStateUpdate]: voiceStateUpdate,
   [GatewayDispatchEvents.VoiceServerUpdate]: voiceServerUpdate,
   [GatewayDispatchEvents.GuildCreate]: guildCreate,
+  [GatewayDispatchEvents.MessageCreate]: messageCreate,
 };
 
 export default handlers;

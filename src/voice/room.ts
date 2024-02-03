@@ -1,6 +1,7 @@
 import { Readable } from "stream";
 import { API, APIMessage } from "@discordjs/core";
 import {
+  AudioPlayerStatus,
   NoSubscriberBehavior,
   StreamType,
   VoiceConnection,
@@ -12,7 +13,8 @@ import {
 } from "@discordjs/voice";
 import { WebSocketManager } from "@discordjs/ws";
 import { Mutex } from "async-mutex";
-import { except } from "../common/functions.js";
+import cleanContent from "../common/cleanContent.js";
+import { __catch, except } from "../common/functions.js";
 import { prisma } from "../index.js";
 import Synthesizer from "../synthesizer/index.js";
 import voiceAdapterCreator from "./voiceAdapterCreator.js";
@@ -48,6 +50,7 @@ export default class Room {
   async destroy() {
     this.connection?.disconnect();
     this.connection?.destroy();
+    this.audioResourceLock.cancel();
     roomManager.delete(this.guildId);
   }
 
@@ -66,10 +69,9 @@ export default class Room {
         userConfig?.pitch ?? 1,
         userConfig?.speed ?? 1,
       );
-
       const resource = createAudioResource(
         Readable.fromWeb(
-          (await synthesizer.synthesis(message.content)) ||
+          (await synthesizer.synthesis(cleanContent(message))) ||
             (() => {
               throw "fuck";
             })(),
@@ -81,9 +83,19 @@ export default class Room {
       );
 
       this.audioPlayer.play(resource);
+
+      await entersState(this.audioPlayer, AudioPlayerStatus.Idle, 5_000).catch(
+        () => this.audioPlayer.stop(),
+      );
     } finally {
       release();
     }
+  }
+
+  async stop() {
+    this.audioResourceLock.cancel();
+    this.audioPlayer.stop(true);
+    await entersState(this.audioPlayer, AudioPlayerStatus.Idle, 5_000);
   }
 }
 

@@ -8,10 +8,13 @@ import { members } from "../common/cache.js";
 export default async ({
   data,
 }: WithIntrinsicProps<GatewayGuildMemberUpdateDispatchData>) => {
-  const old = members.get(data.user.id);
+  const old = members.get(data.guild_id, data.user.id);
 
   if (!old) return;
 
   // maybe ok
-  members.set(data.user.id, { ...old, ...(data as APIGuildMember) });
+  members.set(data.guild_id, data.user.id, {
+    ...old,
+    ...(data as APIGuildMember),
+  });
 };

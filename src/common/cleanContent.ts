@@ -13,8 +13,7 @@ const timestampPattern = /<t:(?<timestamp>\d+)(:(?<style>.))?>/g;
 const discordPattern =
   /https?:\/\/(www\.)?((canary|ptb)\.)?discord(app)?\.com\/channels\/(?<guildId>\d{17,19})\/(?<channelId>\d{17,19})(\/(?<messageId>\d{17,19}))?/g;
 const hyperLinkPattern = new RegExp(
-  // biome-ignore lint/style/useTemplate: fuck
-  "\\[(?<name>[^\\[\\]]+)\\]" + uriPattern.source,
+  `\\[(?<name>[^\\[\\]]+)\\]\\(<?${uriPattern.source}>?\\)`,
   "g",
 );
 const codeBlockPattern = /```(?<name>[a-zA-Z0-9]+)?((?!```)(.|\n))+```/g;
@@ -31,10 +30,7 @@ export default function cleanContent(
     .replaceAll(spoilerPattern, "スポイラー")
     .replaceAll(
       hyperLinkPattern,
-      generateReplacer(
-        ({ name }) => `${name} カッコ ハイパーリンク カッコトジ`,
-        "",
-      ),
+      generateReplacer(({ name }) => `${name} カッコ ハイパーリンク`, "", ""),
     )
     .replaceAll(discordPattern, (...args: unknown[]) => {
       const groups = args.at(-1);

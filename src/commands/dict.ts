@@ -79,7 +79,11 @@ export default class Dict implements ICommand {
       await prisma.dictionary.upsert({
         create: { guildId: i.guild_id, read: read.value, word: word.value },
         update: { read: read.value },
-        where: { guildId: i.guild_id, word: word.value },
+        where: {
+          guildId: i.guild_id,
+          word: word.value,
+          guildId_word: { guildId: i.guild_id, word: word.value },
+        },
       });
 
       return await api.interactions.editReply(i.application_id, i.token, {

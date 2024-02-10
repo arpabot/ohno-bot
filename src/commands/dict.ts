@@ -37,6 +37,17 @@ export default class Dict implements ICommand {
               .setRequired(true),
           ),
       )
+      .addSubcommand(
+        new SlashCommandSubcommandBuilder()
+          .setName("delete")
+          .setDescription("サーバーの辞書を削除します")
+          .addStringOption(
+            new SlashCommandStringOption()
+              .setName("word")
+              .setDescription("単語")
+              .setRequired(true),
+          ),
+      )
       .toJSON();
   }
 
@@ -77,6 +88,41 @@ export default class Dict implements ICommand {
             title: "辞書を編集しました",
             description: `単語: \`${word?.value}\`
 読み: \`${read?.value}\``,
+            color: 0x00ff00,
+          },
+        ],
+      });
+    }
+
+    if (command.name === "delete") {
+      const word = command.options?.find((x) => x.name === "word");
+
+      if (!transmute<APIApplicationCommandInteractionDataStringOption>(word))
+        return;
+
+      const dict = await prisma.dictionary.findFirst({
+        where: { guildId: i.guild_id, word: word.value },
+      });
+
+      if (!dict)
+        return await api.interactions.editReply(i.application_id, i.token, {
+          embeds: [
+            {
+              title: "エラーです",
+              description: "単語が存在しません",
+              color: 0xff0000,
+            },
+          ],
+        });
+
+      await prisma.dictionary.delete({ where: { id: dict.id } });
+
+      return await api.interactions.editReply(i.application_id, i.token, {
+        embeds: [
+          {
+            title: "辞書を削除しました",
+            description: `単語: \`${dict.word}\`
+読み: \`${dict.read}\``,
             color: 0x00ff00,
           },
         ],

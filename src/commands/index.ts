@@ -5,9 +5,10 @@ import {
 } from "@discordjs/core";
 import { NonNullableByKey } from "../common/types.js";
 import Join from "./join.js";
+import Leave from "./leave.js";
 import Ping from "./ping.js";
 
-export const commands: ICommand[] = [new Ping(), new Join()];
+export const commands: ICommand[] = [new Ping(), new Join(), new Leave()];
 
 export interface ICommand {
   defition(): RESTPostAPIChatInputApplicationCommandsJSONBody;

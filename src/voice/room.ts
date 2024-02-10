@@ -54,12 +54,15 @@ export default class Room {
     roomManager.delete(this.guildId);
   }
 
-  async speak(message: APIMessage) {
+  async speak(message: APIMessage & { guild_id: string }) {
     const release = await this.audioResourceLock.acquire();
 
     try {
       const userConfig = await prisma.synthesizer.findFirst({
         where: { userId: message.author.id },
+      });
+      const dictionaries = await prisma.dictionary.findMany({
+        where: { guildId: message.guild_id },
       });
       const synthesizer = new Synthesizer(
         except(process.env["key"]),
@@ -69,9 +72,16 @@ export default class Room {
         userConfig?.pitch ?? 1,
         userConfig?.speed ?? 1,
       );
+
+      let content = cleanContent(message);
+
+      for (const dict of dictionaries) {
+        content = content.replaceAll(dict.word, dict.read);
+      }
+
       const resource = createAudioResource(
         Readable.fromWeb(
-          (await synthesizer.synthesis(cleanContent(message))) ||
+          (await synthesizer.synthesis(content)) ||
             (() => {
               throw "fuck";
             })(),

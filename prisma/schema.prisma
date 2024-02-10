@@ -20,6 +20,8 @@ model Synthesizer {
 model Dictionary {
   id Int @id @default(autoincrement())
   guildId String
-  word String @unique
+  word String
   read String
+
+  @@unique([guildId, word])
 }

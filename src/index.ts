@@ -34,5 +34,4 @@ for (const [event, fn] of Object.entries(handlers)) {
 await gateway.connect();
 await prisma.$connect();
 
-export { gateway };
-export { prisma };
+export { gateway, prisma, client };

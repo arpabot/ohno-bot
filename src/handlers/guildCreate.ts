@@ -12,10 +12,13 @@ import {
   voiceStates,
 } from "../common/cache.js";
 import { NonNullableByKey } from "../common/types.js";
+import { client } from "../index.js";
 
 export default async ({
   data,
 }: WithIntrinsicProps<GatewayGuildCreateDispatchData>) => {
+  client.requestGuildMembers({ guild_id: data.id, query: "", limit: 0 });
+
   for (const member of data.members) {
     if (!member.user) continue;
 

@@ -48,6 +48,11 @@ export default class Dict implements ICommand {
               .setRequired(true),
           ),
       )
+      .addSubcommand(
+        new SlashCommandSubcommandBuilder()
+          .setName("list")
+          .setDescription("サーバーの辞書の一覧をテキストファイルで送信します"),
+      )
       .toJSON();
   }
 
@@ -133,6 +138,37 @@ export default class Dict implements ICommand {
       });
     }
 
+    if (command.name === "list") {
+      const dictionaries = await prisma.dictionary.findMany({
+        where: { guildId: i.guild_id },
+      });
+      const csv = [["ID", "単語", "読み"]]
+        .concat(
+          dictionaries.map((x) => [
+            x.id.toString(),
+            escapeCsvCell(x.word),
+            escapeCsvCell(x.read),
+          ]),
+        )
+        .map((x) => x.join(","))
+        .join("\n");
+
+      return await api.interactions.editReply(i.application_id, i.token, {
+        files: [{ name: "0", data: csv }],
+        attachments: [{ id: 0, filename: "list.csv" }],
+      });
+    }
+
     throw "unreachable";
   }
+}
+
+function escapeCsvCell(input: string) {
+  let text = input;
+
+  if (input.includes('"') || input.includes(",")) {
+    text = `"${text.replaceAll('"', '""')}"`;
+  }
+
+  return text;
 }

@@ -1,4 +1,6 @@
-import { version } from "../common/version.js";
+import manifest from "../../.github/release-please/.release-please-manifest.json" assert {
+  type: "json",
+};
 
 const escapeMap: Record<string, string | undefined> = {
   "<": "&lt;",
@@ -40,7 +42,7 @@ export default class Synthesizer {
 </voice>\
 </speak>`,
       headers: {
-        "User-Agent": `OHNO/${version}`,
+        "User-Agent": `OHNO/${manifest["."]}`,
         "Content-Type": "application/ssml+xml",
         "Ocp-Apim-Subscription-Key": this.key,
         "X-Microsoft-OutputFormat": "ogg-48khz-16bit-mono-opus",

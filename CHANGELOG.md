@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/yuimarudev/ohno-rewrite/compare/v0.1.2...v0.2.0) (2024-02-11)
+
+
+### Miscellaneous Chores
+
+* release 0.2.0 ([34dce32](https://github.com/yuimarudev/ohno-rewrite/commit/34dce32d550a1821915457bfada903462b51cd66))
+
 ## [0.1.2](https://github.com/yuimarudev/ohno-rewrite/compare/v0.1.1...v0.1.2) (2024-02-11)
 
 

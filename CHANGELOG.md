@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/yuimarudev/ohno-rewrite/compare/v0.1.1...v0.1.2) (2024-02-11)
+
+
+### Features
+
+* /dict list ([#6](https://github.com/yuimarudev/ohno-rewrite/issues/6)) ([c8abdad](https://github.com/yuimarudev/ohno-rewrite/commit/c8abdadacf47dffa8fd52576767581b1b2b7a926))
+
 ## [0.1.1](https://github.com/yuimarudev/ohno-rewrite/compare/v0.1.0...v0.1.1) (2024-02-10)
 
 

@@ -1,8 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/swcrc",
   "jsc": {
+    "experimental": {
+      "keepImportAssertions": true
+    },
     "parser": {
-      "syntax": "typescript"
+      "syntax": "typescript",
+      "importAssertions": true
     },
     "target": "esnext"
   },

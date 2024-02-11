@@ -1,1 +1,0 @@
-mv src/common/version src/common/version.ts

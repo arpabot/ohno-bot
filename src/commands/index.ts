@@ -1,6 +1,7 @@
 import {
   API,
   APIChatInputApplicationCommandInteraction,
+  APIInteractionGuildMember,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
 import { NonNullableByKey } from "../common/types.js";
@@ -21,9 +22,13 @@ export interface ICommand {
   run(
     api: API,
     i: NonNullableByKey<
-      APIChatInputApplicationCommandInteraction,
-      "guild_id",
-      string
+      NonNullableByKey<
+        APIChatInputApplicationCommandInteraction,
+        "guild_id",
+        string
+      >,
+      "member",
+      APIInteractionGuildMember
     >,
   ): Promise<unknown>;
 }

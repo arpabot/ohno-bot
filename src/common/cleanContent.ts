@@ -96,7 +96,8 @@ export default function cleanContent(
     .replaceAll(
       timestampPattern,
       generateReplacer((_) => null, "タイムスタンプ"),
-    );
+    )
+    .slice(0, 200);
 }
 
 function generateReplacer(

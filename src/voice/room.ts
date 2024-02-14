@@ -94,7 +94,7 @@ export default class Room {
 
       this.audioPlayer.play(resource);
 
-      await entersState(this.audioPlayer, AudioPlayerStatus.Idle, 5_000).catch(
+      await entersState(this.audioPlayer, AudioPlayerStatus.Idle, 10_000).catch(
         () => this.audioPlayer.stop(),
       );
     } finally {

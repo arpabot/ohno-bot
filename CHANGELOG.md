@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/yuimarudev/ohno-rewrite/compare/v0.2.0...v0.2.1) (2024-02-14)
+
+
+### Features
+
+* /user-settings speaker ([#10](https://github.com/yuimarudev/ohno-rewrite/issues/10)) ([81f5567](https://github.com/yuimarudev/ohno-rewrite/commit/81f556783f43354cd144c352fbe26cc0b0bf881e))
+
 ## [0.2.0](https://github.com/yuimarudev/ohno-rewrite/compare/v0.1.2...v0.2.0) (2024-02-11)
 
 

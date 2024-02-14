@@ -57,13 +57,4 @@ export default class Synthesizer {
   baseURL(route: string) {
     return `https://${this.region}.tts.speech.microsoft.com/cognitiveservices/${route}`;
   }
-
-  toJSON() {
-    return JSON.stringify({
-      voice: this.voice,
-      speed: this.speed,
-      userId: this.userId,
-      pitch: this.pitch,
-    });
-  }
 }

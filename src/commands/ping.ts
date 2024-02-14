@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import {
   API,
   APIChatInputApplicationCommandInteraction,
+  APIInteractionGuildMember,
   MessageFlags,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
@@ -19,9 +20,13 @@ export default class Ping implements ICommand {
   async run(
     api: API,
     i: NonNullableByKey<
-      APIChatInputApplicationCommandInteraction,
-      "guild_id",
-      string
+      NonNullableByKey<
+        APIChatInputApplicationCommandInteraction,
+        "guild_id",
+        string
+      >,
+      "member",
+      APIInteractionGuildMember
     >,
   ): Promise<unknown> {
     return await api.interactions.editReply(i.application_id, i.token, {

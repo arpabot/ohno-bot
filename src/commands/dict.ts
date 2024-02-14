@@ -8,6 +8,7 @@ import {
   APIApplicationCommandInteractionDataStringOption,
   APIApplicationCommandInteractionDataSubcommandOption,
   APIChatInputApplicationCommandInteraction,
+  APIInteractionGuildMember,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
 import { transmute } from "../common/functions.js";
@@ -59,9 +60,13 @@ export default class Dict implements ICommand {
   async run(
     api: API,
     i: NonNullableByKey<
-      APIChatInputApplicationCommandInteraction,
-      "guild_id",
-      string
+      NonNullableByKey<
+        APIChatInputApplicationCommandInteraction,
+        "guild_id",
+        string
+      >,
+      "member",
+      APIInteractionGuildMember
     >,
   ): Promise<unknown> {
     const command = i.data.options?.[0];

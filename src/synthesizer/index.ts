@@ -34,7 +34,7 @@ export default class Synthesizer {
       body: `
 <speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xml:lang=\"ja-JP\">\
 <voice name=\"${this.voice}\">\
-  <prosody rate=\"${this.speed + 0.2}\">\
+  <prosody rate=\"${this.speed}\">\
     ${text.replaceAll(/["&'<>"]/g, (match: string) => {
       return escapeMap[match] ?? "";
     })}\

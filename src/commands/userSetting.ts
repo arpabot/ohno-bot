@@ -1,11 +1,13 @@
 import {
   SlashCommandBuilder,
+  SlashCommandNumberOption,
   SlashCommandStringOption,
   SlashCommandSubcommandBuilder,
 } from "@discordjs/builders";
 import {
   API,
   APIApplicationCommandInteractionDataSubcommandOption,
+  APIApplicationCommandNumberOption,
   APIApplicationCommandStringOption,
   APIChatInputApplicationCommandInteraction,
   APIInteractionGuildMember,
@@ -36,6 +38,19 @@ export class UserSettings implements ICommand {
                   return { name: x[0], value: x[1] };
                 }),
               ),
+          ),
+      )
+      .addSubcommand(
+        new SlashCommandSubcommandBuilder()
+          .setName("speed")
+          .setDescription("読み上げる速度を設定します")
+          .addNumberOption(
+            new SlashCommandNumberOption()
+              .setName("rate")
+              .setDescription("速度（デフォルトは 1.0 です）")
+              .setMinValue(0.5)
+              .setMaxValue(2.0)
+              .setRequired(true),
           ),
       )
       .toJSON();
@@ -95,6 +110,32 @@ export class UserSettings implements ICommand {
             } から ${
               Object.entries(voices).find((x) => x[1] === speaker.value)?.[0]
             } へ変更しました`,
+            color: 0x00ff00,
+          },
+        ],
+      });
+    }
+
+    if (command.name === "speed") {
+      const rate = command.options?.[0];
+
+      if (!transmute<APIApplicationCommandNumberOption>(rate))
+        throw "unreachable";
+
+      const old = synthesizer.speed;
+      synthesizer.speed = rate.value;
+
+      await prisma.synthesizer.upsert({
+        create: synthesizer,
+        update: synthesizer,
+        where: { userId: i.member.user.id },
+      });
+
+      return await api.interactions.editReply(i.application_id, i.token, {
+        embeds: [
+          {
+            title: "読み上げる速度を変更しました",
+            description: `速度を ${old} から ${rate.value} へ変更しました`,
             color: 0x00ff00,
           },
         ],

@@ -17,7 +17,9 @@ import { client } from "../index.js";
 export default async ({
   data,
 }: WithIntrinsicProps<GatewayGuildCreateDispatchData>) => {
-  client.requestGuildMembers({ guild_id: data.id, query: "", limit: 0 });
+  client
+    .requestGuildMembers({ guild_id: data.id, query: "", limit: 0 })
+    .catch((x) => void x);
 
   for (const member of data.members) {
     if (!member.user) continue;

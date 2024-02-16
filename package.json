@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "swc src --out-dir dist",
+    "build": "swc src --strip-leading-paths --out-dir dist",
     "start": "pnpm run build && node --enable-source-maps dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.3](https://github.com/yuimarudev/ohno-rewrite/compare/v0.2.2...v0.2.3) (2024-02-16)
+
+
+### Bug Fixes
+
+* **errors:** handle requestGuildMembers ([0401e0f](https://github.com/yuimarudev/ohno-rewrite/commit/0401e0ffe46633b3e7d2230c5232d2b301ba226b))
+* fuck @swc/core breaking change ([78be241](https://github.com/yuimarudev/ohno-rewrite/commit/78be2412165ee209ec685246bb2ce15f00ad9a93))
+* **node:** pin node version at .npmrc ([51112ba](https://github.com/yuimarudev/ohno-rewrite/commit/51112ba44aec5d6ac2e2e20c1122ac13db62b881))
+* **node:** pin node@21 ([a934645](https://github.com/yuimarudev/ohno-rewrite/commit/a9346459881b45ce18dfcc0a17dc211f955e0e19))
+
 ## [0.2.2](https://github.com/yuimarudev/ohno-rewrite/compare/v0.2.1...v0.2.2) (2024-02-15)
 
 

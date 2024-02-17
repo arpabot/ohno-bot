@@ -16,7 +16,6 @@ const gateway = new WebSocketManager({
     GatewayIntentBits.Guilds |
     GatewayIntentBits.GuildMembers |
     GatewayIntentBits.GuildVoiceStates |
-    GatewayIntentBits.GuildMembers |
     GatewayIntentBits.GuildMessages |
     GatewayIntentBits.MessageContent,
   rest,

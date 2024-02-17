@@ -2,6 +2,7 @@ import {
   APIGuildMember,
   APIUser,
   GatewayGuildCreateDispatchData,
+  GatewayOpcodes,
   WithIntrinsicProps,
 } from "@discordjs/core";
 import {
@@ -12,14 +13,22 @@ import {
   voiceStates,
 } from "../common/cache.js";
 import { NonNullableByKey } from "../common/types.js";
-import { client } from "../index.js";
+import { gateway } from "../index.js";
 
 export default async ({
   data,
 }: WithIntrinsicProps<GatewayGuildCreateDispatchData>) => {
-  client
-    .requestGuildMembers({ guild_id: data.id, query: "", limit: 0 })
-    .catch((x) => void x);
+  gateway.send(
+    Number(BigInt(data.id) >> 22n) % (await gateway.getShardCount()),
+    {
+      op: GatewayOpcodes.RequestGuildMembers,
+      d: {
+        guild_id: data.id,
+        limit: 0,
+        query: "",
+      },
+    },
+  );
 
   for (const member of data.members) {
     if (!member.user) continue;

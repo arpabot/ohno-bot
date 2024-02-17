@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.4](https://github.com/yuimarudev/ohno-rewrite/compare/v0.2.3...v0.2.4) (2024-02-17)
+
+
+### Performance Improvements
+
+* reduce event listeners ([#29](https://github.com/yuimarudev/ohno-rewrite/issues/29)) ([428e725](https://github.com/yuimarudev/ohno-rewrite/commit/428e7255bb5c99ff1ff388614d1c3bd6002773ae))
+
 ## [0.2.3](https://github.com/yuimarudev/ohno-rewrite/compare/v0.2.2...v0.2.3) (2024-02-16)
 
 

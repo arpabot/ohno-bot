@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.5](https://github.com/yuimarudev/ohno-rewrite/compare/v0.2.4...v0.2.5) (2024-02-17)
+
+
+### Features
+
+* /help ([#31](https://github.com/yuimarudev/ohno-rewrite/issues/31)) ([7b36c39](https://github.com/yuimarudev/ohno-rewrite/commit/7b36c3934c8da2a1c0f54a030acff586ab52537c))
+
 ## [0.2.4](https://github.com/yuimarudev/ohno-rewrite/compare/v0.2.3...v0.2.4) (2024-02-17)
 
 

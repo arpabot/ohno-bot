@@ -11,8 +11,11 @@ export default async ({
   api,
   data,
 }: WithIntrinsicProps<GatewayInteractionCreateDispatchData>) => {
-  await api.interactions.defer(data.id, data.token);
+  const error = await api.interactions
+    .defer(data.id, data.token)
+    .catch((x) => x as Error);
 
+  if (error) return console.error(error);
   if (!validate(data)) return false;
 
   const command = commands.find((x) => x.defition().name === data.data.name);

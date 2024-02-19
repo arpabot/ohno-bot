@@ -39,14 +39,25 @@ export default class Leave implements ICommand {
 
     if (state?.channel_id !== room?.voiceChannelId)
       return await api.interactions.editReply(i.application_id, i.token, {
-        content:
-          "あなたが Bot と同じボイスチャンネルにいないかあなたがボイスチャンネルにいません",
+        embeds: [
+          {
+            description:
+              "あなたが Bot と同じボイスチャンネルにいないかあなたがボイスチャンネルにいません",
+            color: 0xff00ff,
+          },
+        ],
         flags: MessageFlags.Ephemeral,
       });
 
     await room?.destroy();
+
     return await api.interactions.editReply(i.application_id, i.token, {
-      content: "退出しました",
+      embeds: [
+        {
+          description: "退出しました",
+          color: 0xff0000,
+        },
+      ],
     });
   }
 }

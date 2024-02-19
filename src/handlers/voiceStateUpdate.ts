@@ -48,8 +48,13 @@ export default async ({
             await __catch([
               room.destroy(),
               room.api.channels.createMessage(room.textChannelId, {
-                content:
-                  "ボイスチャンネルから切断されました。意図した挙動でないなら /join で再接続してください。",
+                embeds: [
+                  {
+                    color: 0xff0000,
+                    description:
+                      "ボイスチャンネルから切断されました．意図した挙動でないなら /join で再接続してください．",
+                  },
+                ],
               }),
             ]);
           }

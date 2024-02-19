@@ -36,7 +36,12 @@ export default class Join implements ICommand {
   ): Promise<unknown> {
     if (roomManager.get(i.guild_id))
       return await api.interactions.editReply(i.application_id, i.token, {
-        content: "すでに Bot が別のボイスチャンネルに接続しています",
+        embeds: [
+          {
+            color: 0xff0000,
+            description: "すでに Bot が別のボイスチャンネルに接続しています",
+          },
+        ],
         flags: MessageFlags.Ephemeral,
       });
 
@@ -44,7 +49,12 @@ export default class Join implements ICommand {
 
     if (!states)
       return await api.interactions.editReply(i.application_id, i.token, {
-        content: "あなたはボイスチャンネルに接続していません",
+        embeds: [
+          {
+            color: 0xff0000,
+            description: "あなたはボイスチャンネルに接続していません",
+          },
+        ],
         flags: MessageFlags.Ephemeral,
       });
 
@@ -52,7 +62,12 @@ export default class Join implements ICommand {
 
     if (!state || !state.channel_id)
       return await api.interactions.editReply(i.application_id, i.token, {
-        content: "あなたはボイスチャンネルに接続していません",
+        embeds: [
+          {
+            color: 0xff0000,
+            description: "あなたはボイスチャンネルに接続していません",
+          },
+        ],
         flags: MessageFlags.Ephemeral,
       });
 
@@ -67,7 +82,7 @@ export default class Join implements ICommand {
     api.interactions.editReply(i.application_id, i.token, {
       embeds: [
         {
-          title: "接続しています...",
+          description: "接続しています...",
           color: 0xff00ff,
         },
       ],
@@ -79,7 +94,7 @@ export default class Join implements ICommand {
       content: "",
       embeds: [
         {
-          title: "接続しました",
+          description: "接続しました",
           color: 0xffff00,
         },
       ],

@@ -1,5 +1,5 @@
 import { Readable } from "stream";
-import { API, APIMessage } from "@discordjs/core";
+import { API, APIMessage, GatewayVoiceState } from "@discordjs/core";
 import {
   AudioPlayerStatus,
   NoSubscriberBehavior,
@@ -13,7 +13,9 @@ import {
 } from "@discordjs/voice";
 import { WebSocketManager } from "@discordjs/ws";
 import { Mutex } from "async-mutex";
+import { channels, members, users } from "../commons/cache.js";
 import cleanContent from "../commons/cleanContent.js";
+import constructSpeakableMessage from "../commons/constructSpeakableMessage.js";
 import { __catch, expect } from "../commons/functions.js";
 import { prisma } from "../index.js";
 import Synthesizer from "../synthesizer/index.js";
@@ -106,6 +108,94 @@ export default class Room {
     this.audioResourceLock.cancel();
     this.audioPlayer.stop(true);
     await entersState(this.audioPlayer, AudioPlayerStatus.Idle, 5_000);
+  }
+
+  async handleVoiceStateUpdate(
+    oldState: GatewayVoiceState | undefined,
+    newState: GatewayVoiceState,
+  ) {
+    if (newState.member?.user && newState.guild_id) {
+      users.set(newState.user_id, newState.member.user);
+      members.set(newState.guild_id, newState.user_id, {
+        ...newState.member,
+        user: newState.member.user,
+        guild_id: newState.guild_id,
+      });
+    }
+
+    if (!newState.guild_id) return;
+    if (
+      newState.user_id ===
+      atob(
+        expect(
+          expect<string | undefined, string>(process.env["token"])
+            .split(".")
+            .at(0),
+        ),
+      )
+    )
+      return;
+
+    if (
+      oldState?.channel_id !== this.voiceChannelId &&
+      newState.channel_id === this.voiceChannelId
+    ) {
+      const message = constructSpeakableMessage(
+        `${
+          members.get(newState.guild_id, newState.user_id)?.nick ??
+          users.get(newState.user_id)?.global_name ??
+          users.get(newState.user_id)?.username ??
+          "不明なユーザー"
+        }が入室しました`,
+        newState.user_id,
+        newState.guild_id,
+      );
+
+      if (!message) return;
+
+      await this.speak(message);
+    }
+
+    if (
+      oldState?.channel_id === this.voiceChannelId &&
+      newState.channel_id !== oldState.channel_id &&
+      newState.channel_id !== this.voiceChannelId &&
+      newState.channel_id
+    ) {
+      const message = constructSpeakableMessage(
+        `${
+          members.get(newState.guild_id, newState.user_id)?.nick ??
+          users.get(newState.user_id)?.global_name ??
+          users.get(newState.user_id)?.username ??
+          "不明なユーザー"
+        }が${
+          channels.get(newState.channel_id ?? "")?.name ?? "不明なチャンネル"
+        }へ移動しました`,
+        newState.user_id,
+        newState.guild_id,
+      );
+
+      if (!message) return;
+
+      await this.speak(message);
+    }
+
+    if (oldState?.channel_id === this.voiceChannelId && !newState.channel_id) {
+      const message = constructSpeakableMessage(
+        `${
+          members.get(newState.guild_id, newState.user_id)?.nick ??
+          users.get(newState.user_id)?.global_name ??
+          users.get(newState.user_id)?.username ??
+          "不明なユーザー"
+        }が退出しました`,
+        newState.user_id,
+        newState.guild_id,
+      );
+
+      if (!message) return;
+
+      await this.speak(message);
+    }
   }
 }
 

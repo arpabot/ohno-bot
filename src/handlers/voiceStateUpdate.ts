@@ -20,10 +20,13 @@ export default async ({
   try {
     const states = voiceStates.get(data.guild_id) ?? [];
     const index = states.findIndex((x) => x.user_id === data.user_id);
+    const room = roomManager.get(data.guild_id);
 
     if (index !== -1) {
+      room?.handleVoiceStateUpdate(states[index], data).catch(console.error);
       states[index] = data;
     } else {
+      room?.handleVoiceStateUpdate(undefined, data).catch(console.error);
       states.push(data);
     }
 
@@ -40,8 +43,6 @@ export default async ({
       if (data.guild_id && data.session_id && data.user_id) {
         adapters.get(data.guild_id)?.onVoiceStateUpdate(data);
         if (!data.channel_id) {
-          const room = roomManager.get(data.guild_id);
-
           if (room) {
             await __catch([
               room.destroy(),

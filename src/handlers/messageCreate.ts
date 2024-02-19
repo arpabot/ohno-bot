@@ -40,8 +40,8 @@ export default async ({
   if (attachment) {
     data.content = `${
       mimeMap[(attachment.content_type ?? "").split("/").at(0) ?? ""] ??
-      "データファイル"
-    } が添付されました ${data.content ?? ""}`;
+      "データ"
+    }ファイル が添付されました ${data.content ?? ""}`;
   }
 
   room.speak(data).catch((x) => {

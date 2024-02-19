@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.1](https://github.com/arpabot/ohno-bot/compare/v1.0.0...v1.0.1) (2024-02-19)
+
+
+### Bug Fixes
+
+* incorrect stream notification ([69883e6](https://github.com/arpabot/ohno-bot/commit/69883e6dc46a709d05767377e06283f99c66c73b))
+* release-please permission ([ad53a72](https://github.com/arpabot/ohno-bot/commit/ad53a725467ec331ec52bb7928592fd35027bb5d))
+* release-please permission ([0eeb661](https://github.com/arpabot/ohno-bot/commit/0eeb6617942807514243b5772aed77cb0a461513))
+* release-please permission ([22d4806](https://github.com/arpabot/ohno-bot/commit/22d480697af40054dc3f2f98fd4c6a54234291b1))
+* workflows ([841fc90](https://github.com/arpabot/ohno-bot/commit/841fc9087f58901621626bfdc7260e77d1ee917d))
+
 ## [1.0.0](https://github.com/yuimarudev/ohno-rewrite/compare/v0.2.6...v1.0.0) (2024-02-19)
 
 

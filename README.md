@@ -1,7 +1,9 @@
-# ohno-rewrite
-このリポジトリは Discord の読み上げ Bot [ohno](https://github.com/arpabot/ohno) を TypeScript で書き換えたものです
+# ohno-bot
+このリポジトリは Discord の既存の [ohno-old](https://github.com/arpabot/ohno-old) を TypeScript で書き換えたものです
 
 現在，仕様が決まっておらず動作が不安定です
+
+もしセルフホストが面倒なら，すでに [動いている Bot](https://discord.com/api/oauth2/authorize?client_id=1104217377840840724&permissions=3146752&scope=bot%20applications.commands) がありますから導入してみてください
 
 # コマンドのヘルプ
 

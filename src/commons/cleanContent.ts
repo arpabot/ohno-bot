@@ -43,7 +43,7 @@ export default function cleanContent(
         return "";
 
       const channel = channels.get(groups.channelId);
-      const channelName = channel ? `@${channel.name}` : "不明なチャンネル";
+      const channelName = channel ? `#${channel.name}` : "不明なチャンネル";
 
       return message.guild_id === groups.guildId
         ? groups.messageId
@@ -91,7 +91,7 @@ export default function cleanContent(
     )
     .replaceAll(
       customEmojiPattern,
-      generateReplacer(({ name }) => name, ""),
+      generateReplacer(({ name }) => name, "", ""),
     )
     .replaceAll(
       timestampPattern,

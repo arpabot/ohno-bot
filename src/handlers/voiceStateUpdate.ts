@@ -4,7 +4,7 @@ import {
 } from "@discordjs/core";
 import { Mutex } from "async-mutex";
 import { voiceStates } from "../commons/cache.js";
-import { __catch, except } from "../commons/functions.js";
+import { __catch, expect } from "../commons/functions.js";
 import { roomManager } from "../voice/room.js";
 import { adapters } from "../voice/voiceAdapterCreator.js";
 
@@ -30,8 +30,8 @@ export default async ({
     if (
       data.member?.user?.id ===
       atob(
-        except(
-          except<string | undefined, string>(process.env["token"])
+        expect(
+          expect<string | undefined, string>(process.env["token"])
             .split(".")
             .at(0),
         ),

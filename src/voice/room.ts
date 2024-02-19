@@ -14,7 +14,7 @@ import {
 import { WebSocketManager } from "@discordjs/ws";
 import { Mutex } from "async-mutex";
 import cleanContent from "../commons/cleanContent.js";
-import { __catch, except } from "../commons/functions.js";
+import { __catch, expect } from "../commons/functions.js";
 import { prisma } from "../index.js";
 import Synthesizer from "../synthesizer/index.js";
 import voiceAdapterCreator from "./voiceAdapterCreator.js";
@@ -65,8 +65,8 @@ export default class Room {
         where: { guildId: message.guild_id },
       });
       const synthesizer = new Synthesizer(
-        except(process.env["key"]),
-        except(process.env["region"]),
+        expect(process.env["key"]),
+        expect(process.env["region"]),
         userConfig?.voice ?? "ja-JP-NanamiNeural",
         message.author.id,
         userConfig?.pitch ?? 1,

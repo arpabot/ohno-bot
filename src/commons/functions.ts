@@ -1,4 +1,4 @@
-export function except<T, T2>(value: T): T2 {
+export function expect<T, T2>(value: T): T2 {
   if (!value) {
     console.log(`Fuck: ${value}`);
     process.exit();

@@ -4,12 +4,12 @@ import {
   APIInteractionGuildMember,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
-import { NonNullableByKey } from "../common/types.js";
+import { NonNullableByKey } from "../commons/types.js";
 import Dict from "./dict.js";
 import Join from "./join.js";
 import Leave from "./leave.js";
 import Ping from "./ping.js";
-import { UserSettings } from "./userSetting.js";
+import UserSettings from "./userSettings.js";
 
 export const commands: ICommand[] = [
   new Ping(),

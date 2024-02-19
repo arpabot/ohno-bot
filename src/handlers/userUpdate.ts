@@ -2,7 +2,7 @@ import {
   GatewayUserUpdateDispatchData,
   WithIntrinsicProps,
 } from "@discordjs/core";
-import { users } from "../common/cache.js";
+import { users } from "../commons/cache.js";
 
 export default async ({
   data,

@@ -4,7 +4,7 @@ import {
   APIInteractionGuildMember,
   InteractionType,
 } from "@discordjs/core";
-import { NonNullableByKey } from "../common/types.js";
+import { NonNullableByKey } from "../commons/types.js";
 
 export function validate(
   i: APIInteraction,

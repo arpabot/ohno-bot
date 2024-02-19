@@ -13,13 +13,13 @@ import {
   APIInteractionGuildMember,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
-import { transmute } from "../common/functions.js";
-import { NonNullableByKey } from "../common/types.js";
+import { transmute } from "../commons/functions.js";
+import { NonNullableByKey } from "../commons/types.js";
 import { prisma } from "../index.js";
 import { voices } from "../synthesizer/index.js";
 import { ICommand } from "./index.js";
 
-export class UserSettings implements ICommand {
+export default class UserSettings implements ICommand {
   defition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
     return new SlashCommandBuilder()
       .setName("user-settings")

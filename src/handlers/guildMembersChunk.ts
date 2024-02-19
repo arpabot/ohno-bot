@@ -4,8 +4,8 @@ import {
   GatewayGuildMembersChunkDispatchData,
   WithIntrinsicProps,
 } from "@discordjs/core";
-import { members, users } from "../common/cache.js";
-import { NonNullableByKey } from "../common/types.js";
+import { members, users } from "../commons/cache.js";
+import { NonNullableByKey } from "../commons/types.js";
 
 export default async ({
   data,

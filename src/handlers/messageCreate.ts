@@ -3,7 +3,7 @@ import {
   GatewayMessageCreateDispatchData,
   WithIntrinsicProps,
 } from "@discordjs/core";
-import { transmute } from "../common/functions.js";
+import { transmute } from "../commons/functions.js";
 import { roomManager } from "../voice/room.js";
 
 export default async ({

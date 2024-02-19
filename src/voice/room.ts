@@ -13,8 +13,8 @@ import {
 } from "@discordjs/voice";
 import { WebSocketManager } from "@discordjs/ws";
 import { Mutex } from "async-mutex";
-import cleanContent from "../common/cleanContent.js";
-import { __catch, except } from "../common/functions.js";
+import cleanContent from "../commons/cleanContent.js";
+import { __catch, except } from "../commons/functions.js";
 import { prisma } from "../index.js";
 import Synthesizer from "../synthesizer/index.js";
 import voiceAdapterCreator from "./voiceAdapterCreator.js";

@@ -6,8 +6,8 @@ import {
   MessageFlags,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
-import { voiceStates } from "../common/cache.js";
-import { NonNullableByKey } from "../common/types.js";
+import { voiceStates } from "../commons/cache.js";
+import { NonNullableByKey } from "../commons/types.js";
 import { gateway } from "../index.js";
 import Room, { roomManager } from "../voice/room.js";
 import { type ICommand } from "./index.js";

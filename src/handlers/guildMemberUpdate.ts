@@ -3,7 +3,7 @@ import {
   GatewayGuildMemberUpdateDispatchData,
   WithIntrinsicProps,
 } from "@discordjs/core";
-import { members } from "../common/cache.js";
+import { members } from "../commons/cache.js";
 
 export default async ({
   data,

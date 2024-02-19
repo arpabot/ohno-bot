@@ -6,7 +6,7 @@ import {
   MessageFlags,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
-import { NonNullableByKey } from "../common/types.js";
+import { NonNullableByKey } from "../commons/types.js";
 import { type ICommand } from "./index.js";
 
 export default class Ping implements ICommand {

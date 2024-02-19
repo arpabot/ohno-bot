@@ -11,8 +11,8 @@ import {
   members,
   users,
   voiceStates,
-} from "../common/cache.js";
-import { NonNullableByKey } from "../common/types.js";
+} from "../commons/cache.js";
+import { NonNullableByKey } from "../commons/types.js";
 import { gateway } from "../index.js";
 
 export default async ({

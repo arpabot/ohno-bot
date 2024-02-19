@@ -3,8 +3,8 @@ import {
   WithIntrinsicProps,
 } from "@discordjs/core";
 import { Mutex } from "async-mutex";
-import { voiceStates } from "../common/cache.js";
-import { __catch, except } from "../common/functions.js";
+import { voiceStates } from "../commons/cache.js";
+import { __catch, except } from "../commons/functions.js";
 import { roomManager } from "../voice/room.js";
 import { adapters } from "../voice/voiceAdapterCreator.js";
 

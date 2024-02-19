@@ -10,8 +10,8 @@ import {
   MessageFlags,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
-import { transmute } from "../common/functions.js";
-import { NonNullableByKey } from "../common/types.js";
+import { transmute } from "../commons/functions.js";
+import { NonNullableByKey } from "../commons/types.js";
 import { type ICommand, commands } from "./index.js";
 
 export default class Help implements ICommand {

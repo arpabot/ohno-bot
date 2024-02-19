@@ -210,6 +210,8 @@ export default class Room {
       if (oldState.self_video !== newState.self_video)
         content = `カメラ配信を${newState.self_video ? "開始" : "終了"}`;
 
+      if (!content) return;
+
       const message = constructSpeakableMessage(
         `${
           members.get(newState.guild_id, newState.user_id)?.nick ??

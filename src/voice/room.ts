@@ -196,6 +196,35 @@ export default class Room {
 
       await this.speak(message);
     }
+
+    if (
+      oldState &&
+      oldState.channel_id === this.voiceChannelId &&
+      newState.channel_id === this.voiceChannelId
+    ) {
+      let content = "";
+
+      if (oldState.self_stream !== newState.self_stream)
+        content = `画面配信を${newState.self_stream ? "開始" : "終了"}`;
+
+      if (oldState.self_video !== newState.self_video)
+        content = `カメラ配信を${newState.self_video ? "開始" : "終了"}`;
+
+      const message = constructSpeakableMessage(
+        `${
+          members.get(newState.guild_id, newState.user_id)?.nick ??
+          users.get(newState.user_id)?.global_name ??
+          users.get(newState.user_id)?.username ??
+          "不明なユーザー"
+        }が${content}しました`,
+        newState.user_id,
+        newState.guild_id,
+      );
+
+      if (!message) return;
+
+      await this.speak(message);
+    }
   }
 }
 

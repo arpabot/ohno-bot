@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.6](https://github.com/yuimarudev/ohno-rewrite/compare/v0.2.5...v0.2.6) (2024-02-19)
+
+
+### Features
+
+* better content ([#36](https://github.com/yuimarudev/ohno-rewrite/issues/36)) ([2b6db4b](https://github.com/yuimarudev/ohno-rewrite/commit/2b6db4bd923df60fb1aecb0e663321cc2cd98886))
+* join and leave notification ([#34](https://github.com/yuimarudev/ohno-rewrite/issues/34)) ([74d3525](https://github.com/yuimarudev/ohno-rewrite/commit/74d3525d95f6c0d4a4d6efd6a5d6c25bde1535b3))
+* notification camera & stream start/end ([#39](https://github.com/yuimarudev/ohno-rewrite/issues/39)) ([5b5f1c7](https://github.com/yuimarudev/ohno-rewrite/commit/5b5f1c7bb0f3e2a4b69b99283c380786f2f97998))
+
 ## [0.2.5](https://github.com/yuimarudev/ohno-rewrite/compare/v0.2.4...v0.2.5) (2024-02-17)
 
 

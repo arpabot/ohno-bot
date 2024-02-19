@@ -42,6 +42,7 @@ export default async ({
     ) {
       if (data.guild_id && data.session_id && data.user_id) {
         adapters.get(data.guild_id)?.onVoiceStateUpdate(data);
+
         if (!data.channel_id) {
           if (room) {
             await __catch([

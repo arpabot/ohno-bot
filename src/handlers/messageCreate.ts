@@ -6,6 +6,13 @@ import {
 import { transmute } from "../commons/functions.js";
 import { roomManager } from "../voice/room.js";
 
+const mimeMap: Record<string, string> = {
+  image: "画像",
+  video: "動画",
+  text: "テキスト",
+  audio: "音声",
+};
+
 export default async ({
   data,
 }: WithIntrinsicProps<GatewayMessageCreateDispatchData>) => {
@@ -27,6 +34,15 @@ export default async ({
   }
 
   if ([";", "_"].some((x) => data.content.startsWith(x))) return;
+
+  const attachment = data.attachments.at(0);
+
+  if (attachment) {
+    data.content = `${
+      mimeMap[(attachment.content_type ?? "").split("/").at(0) ?? ""] ??
+      "データファイル"
+    } が添付されました ${data.content ?? ""}`;
+  }
 
   room.speak(data).catch((x) => {
     if (!(x instanceof Error)) throw x;

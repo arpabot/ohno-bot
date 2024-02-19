@@ -37,6 +37,10 @@ export default async ({
 
   const attachment = data.attachments.at(0);
 
+  for (const sticker of data.sticker_items ?? []) {
+    data.content = `${sticker.name} ${data.content}`;
+  }
+
   if (attachment) {
     data.content = `${
       mimeMap[(attachment.content_type ?? "").split("/").at(0) ?? ""] ??

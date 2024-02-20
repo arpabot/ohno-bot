@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.2](https://github.com/arpabot/ohno-bot/compare/v1.0.1...v1.0.2) (2024-02-20)
+
+
+### Bug Fixes
+
+* まだ声がデカいらしい ([216d6ee](https://github.com/arpabot/ohno-bot/commit/216d6ee28899998e5d9d001c495226d1725f6fb0))
+* まだ声がデカいらしい ([47d8fdc](https://github.com/arpabot/ohno-bot/commit/47d8fdc6b5a216310a9d47c29c04bfc6600f9656))
+* 声がデカい ([777fb6e](https://github.com/arpabot/ohno-bot/commit/777fb6ee0d8edc319ce9b845fc1eac19eee4d5de))
+
 ## [1.0.1](https://github.com/arpabot/ohno-bot/compare/v1.0.0...v1.0.1) (2024-02-19)
 
 

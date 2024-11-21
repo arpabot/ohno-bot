@@ -1,9 +1,7 @@
 # ohno-bot
-このリポジトリは Discord の既存の [ohno-old](https://github.com/arpabot/ohno-old) を TypeScript で書き換えたものです
+このリポジトリは [ohno-old](https://github.com/arpabot/ohno-old) を TypeScript で書き換えたものです
 
-現在，仕様が決まっておらず動作が不安定です
-
-もしセルフホストが面倒なら，すでに [動いている Bot](https://discord.com/api/oauth2/authorize?client_id=1104217377840840724&permissions=3146752&scope=bot%20applications.commands) がありますから導入してみてください
+セルフホストが面倒なら [OHNO](https://discord.com/api/oauth2/authorize?client_id=1104217377840840724&permissions=3146752&scope=bot%20applications.commands) を導入すると幸せになれます
 
 # コマンドのヘルプ
 
@@ -16,16 +14,16 @@
 - 同じボイスチャンネルにいない場合は実行できません
 
 ## /dict put <単語> <読み>
-- サーバー辞書を編集します
+- 辞書を編集します
 - 単語が重複している場合は追加できません
 
 ## /dict delete <単語>
-- サーバー辞書を削除します
+- 辞書を削除します
 - 単語が存在しない場合はエラーを返します
 
 ## /dict list
-- サーバー辞書のリストを CSV で送信します
-- 一応 Excel で parse できるはず
+- 辞書のリストを CSV で送信します
+- 一応 Excel で開くことができるはずです
 
 ## /user-settings speaker <話者>
 - 話者を設定します
@@ -43,10 +41,10 @@
 ## 言語を Rust から TypeScript に変えた理由
 誤字ではないです．普通逆だろと思いましたよね．
 
-これには私自身のスキルに問題があって，もっと Rust のことを深く理解してから Bot を作成したいと思ったからです．
+これには私自身のスキルに問題があって，もっと Rust のことを深く理解してから Rust を使って Bot を作成したいと思ったからです．
 
 ## モチベーション
-なぜ TypeScript なのかというと，比較的新しい薄い Discord API Wrapper の @discordjs/next (@discordjs/{core, ws, rest, util}) を推したいからです．
+なぜ TypeScript なのかというと，薄い Discord API Wrapper の @discordjs/next (@discordjs/{core, ws, rest, util}) を推したいからです．
 
 これらのパッケージは（おそらく，動かそうと思えば）どのランタイムでも動くからです．
 

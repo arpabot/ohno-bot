@@ -205,10 +205,10 @@ export default class Room {
       let content = "";
 
       if (oldState.self_stream !== newState.self_stream)
-        content = `画面配信を${newState.self_stream ? "開始" : "終了"}`;
+        content = `画面共有を${newState.self_stream ? "開始" : "終了"}`;
 
       if (oldState.self_video !== newState.self_video)
-        content = `カメラ配信を${newState.self_video ? "開始" : "終了"}`;
+        content = `カメラを${newState.self_video ? "オン" : "オフ"}に`;
 
       if (!content) return;
 

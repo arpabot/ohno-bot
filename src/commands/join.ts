@@ -83,7 +83,7 @@ export default class Join implements ICommand {
       embeds: [
         {
           description: "接続しています...",
-          color: 0xff00ff,
+          color: 0xffff00,
         },
       ],
     });
@@ -95,7 +95,7 @@ export default class Join implements ICommand {
       embeds: [
         {
           description: "接続しました",
-          color: 0xffff00,
+          color: 0x00ff00,
         },
       ],
     });

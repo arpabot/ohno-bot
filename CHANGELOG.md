@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/arpabot/ohno-bot/compare/v1.0.2...v1.0.3) (2024-11-21)
+
+
+### Miscellaneous Chores
+
+* 1.0.3 ([2a9ee56](https://github.com/arpabot/ohno-bot/commit/2a9ee567081df75d883b21a6a5d207637539175a))
+
 ## [1.0.2](https://github.com/arpabot/ohno-bot/compare/v1.0.1...v1.0.2) (2024-02-20)
 
 

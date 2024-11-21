@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/arpabot/ohno-bot/compare/v1.0.3...v1.0.4) (2024-11-21)
+
+
+### Bug Fixes
+
+* **docs:** typo in README.md ([0292010](https://github.com/arpabot/ohno-bot/commit/0292010a3e2a1b045c4f69423e5e34d5f250e41c))
+
 ## [1.0.3](https://github.com/arpabot/ohno-bot/compare/v1.0.2...v1.0.3) (2024-11-21)
 
 

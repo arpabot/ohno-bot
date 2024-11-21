@@ -2,14 +2,14 @@ import {
   APIGuildMember,
   APIUser,
   GatewayGuildMembersChunkDispatchData,
-  WithIntrinsicProps,
+  ToEventProps,
 } from "@discordjs/core";
 import { members, users } from "../commons/cache.js";
 import { NonNullableByKey } from "../commons/types.js";
 
 export default async ({
   data,
-}: WithIntrinsicProps<GatewayGuildMembersChunkDispatchData>) => {
+}: ToEventProps<GatewayGuildMembersChunkDispatchData>) => {
   for (const member of data.members) {
     if (!member.user) continue;
 

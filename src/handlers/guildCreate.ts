@@ -3,7 +3,7 @@ import {
   APIUser,
   GatewayGuildCreateDispatchData,
   GatewayOpcodes,
-  WithIntrinsicProps,
+  ToEventProps,
 } from "@discordjs/core";
 import {
   channels,
@@ -17,7 +17,7 @@ import { gateway } from "../index.js";
 
 export default async ({
   data,
-}: WithIntrinsicProps<GatewayGuildCreateDispatchData>) => {
+}: ToEventProps<GatewayGuildCreateDispatchData>) => {
   gateway.send(
     Number(BigInt(data.id) >> 22n) % (await gateway.getShardCount()),
     {

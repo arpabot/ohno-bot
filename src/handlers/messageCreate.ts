@@ -1,7 +1,7 @@
 import {
   APIMessage,
   GatewayMessageCreateDispatchData,
-  WithIntrinsicProps,
+  ToEventProps,
 } from "@discordjs/core";
 import { transmute } from "../commons/functions.js";
 import { roomManager } from "../voice/room.js";
@@ -15,7 +15,7 @@ const mimeMap: Record<string, string> = {
 
 export default async ({
   data,
-}: WithIntrinsicProps<GatewayMessageCreateDispatchData>) => {
+}: ToEventProps<GatewayMessageCreateDispatchData>) => {
   if (!data.guild_id) return;
 
   const room = roomManager.get(data.guild_id);

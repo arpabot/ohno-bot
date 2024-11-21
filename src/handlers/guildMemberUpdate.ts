@@ -1,13 +1,13 @@
 import {
   APIGuildMember,
   GatewayGuildMemberUpdateDispatchData,
-  WithIntrinsicProps,
+  ToEventProps,
 } from "@discordjs/core";
 import { members } from "../commons/cache.js";
 
 export default async ({
   data,
-}: WithIntrinsicProps<GatewayGuildMemberUpdateDispatchData>) => {
+}: ToEventProps<GatewayGuildMemberUpdateDispatchData>) => {
   const old = members.get(data.guild_id, data.user.id);
 
   if (!old) return;

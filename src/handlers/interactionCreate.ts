@@ -1,7 +1,7 @@
 import {
   GatewayInteractionCreateDispatchData,
   MessageFlags,
-  WithIntrinsicProps,
+  ToEventProps,
 } from "@discordjs/core";
 import Help from "../commands/help.js";
 import { validate } from "../commands/helper.js";
@@ -10,7 +10,7 @@ import { commands } from "../commands/index.js";
 export default async ({
   api,
   data,
-}: WithIntrinsicProps<GatewayInteractionCreateDispatchData>) => {
+}: ToEventProps<GatewayInteractionCreateDispatchData>) => {
   const error = await api.interactions
     .defer(data.id, data.token)
     .catch((x) => x as Error);

@@ -2,7 +2,7 @@ import {
   ActivityType,
   GatewayReadyDispatchData,
   PresenceUpdateStatus,
-  WithIntrinsicProps,
+  ToEventProps,
 } from "@discordjs/core";
 import manifest from "../../.github/release-please/.release-please-manifest.json" assert {
   type: "json",
@@ -10,9 +10,7 @@ import manifest from "../../.github/release-please/.release-please-manifest.json
 import { initCommands } from "../commands/init.js";
 import { client } from "../index.js";
 
-export default async ({
-  api,
-}: WithIntrinsicProps<GatewayReadyDispatchData>) => {
+export default async ({ api }: ToEventProps<GatewayReadyDispatchData>) => {
   await initCommands(api);
 
   console.log("ready!");

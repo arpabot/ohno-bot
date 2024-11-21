@@ -1,6 +1,6 @@
 import {
   GatewayVoiceStateUpdateDispatchData,
-  WithIntrinsicProps,
+  ToEventProps,
 } from "@discordjs/core";
 import { Mutex } from "async-mutex";
 import { voiceStates } from "../commons/cache.js";
@@ -12,7 +12,7 @@ const lock = new Mutex();
 
 export default async ({
   data,
-}: WithIntrinsicProps<GatewayVoiceStateUpdateDispatchData>) => {
+}: ToEventProps<GatewayVoiceStateUpdateDispatchData>) => {
   if (!data.guild_id) return;
 
   const release = await lock.acquire();

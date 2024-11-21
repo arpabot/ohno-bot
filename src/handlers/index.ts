@@ -1,4 +1,4 @@
-import { GatewayDispatchEvents, WithIntrinsicProps } from "@discordjs/core";
+import { GatewayDispatchEvents, ToEventProps } from "@discordjs/core";
 import guildCreate from "./guildCreate.js";
 import guildMemberUpdate from "./guildMemberUpdate.js";
 import guildMembersChunk from "./guildMembersChunk.js";
@@ -12,7 +12,7 @@ import voiceStateUpdate from "./voiceStateUpdate.js";
 const handlers: {
   // fuck.
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  [key in GatewayDispatchEvents]?: (a: WithIntrinsicProps<any>) => unknown;
+  [key in GatewayDispatchEvents]?: (a: ToEventProps<any>) => unknown;
 } = {
   [GatewayDispatchEvents.Ready]: ready,
   [GatewayDispatchEvents.InteractionCreate]: interactionCreate,

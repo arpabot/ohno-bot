@@ -1,11 +1,8 @@
-import {
-  GatewayUserUpdateDispatchData,
-  WithIntrinsicProps,
-} from "@discordjs/core";
+import { GatewayUserUpdateDispatchData, ToEventProps } from "@discordjs/core";
 import { users } from "../commons/cache.js";
 
 export default async ({
   data,
-}: WithIntrinsicProps<GatewayUserUpdateDispatchData>) => {
+}: ToEventProps<GatewayUserUpdateDispatchData>) => {
   users.set(data.id, data);
 };

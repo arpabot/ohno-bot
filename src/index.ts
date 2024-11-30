@@ -66,5 +66,10 @@ await prisma.$connect();
 
 process.on("SIGINT", handleExit);
 process.on("SIGTERM", handleExit);
+process.on("uncaughtException", async (e) => {
+  await handleExit();
+  console.error("uncaught: %o", e);
+  process.exit(1);
+});
 
 export { gateway, prisma, client };

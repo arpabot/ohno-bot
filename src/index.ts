@@ -35,11 +35,18 @@ const handleExit = async () => {
         },
       ],
     });
-    await prisma.connections.create({
-      data: {
+    await prisma.connections.upsert({
+      create: {
         guildId: room.guildId,
         textChannelId: room.textChannelId,
         voiceChannelId: room.voiceChannelId,
+      },
+      update: {
+        textChannelId: room.textChannelId,
+        voiceChannelId: room.voiceChannelId,
+      },
+      where: {
+        guildId: room.guildId,
       },
     });
   }

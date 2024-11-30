@@ -17,26 +17,30 @@ export default async ({ api }: ToEventProps<GatewayReadyDispatchData>) => {
 
   const connections = await prisma.connections.findMany();
 
-  for (const connection of connections) {
-    await new Room(
-      gateway,
-      api,
-      connection.voiceChannelId,
-      connection.textChannelId,
-      connection.guildId,
-    )
-      .connect()
-      .catch(console.error);
-    await api.channels.createMessage(connection.textChannelId, {
-      embeds: [
-        {
-          description: "接続しました（再起動が終了しました）",
-          color: 0x00ff00,
-        },
-      ],
-    });
-    await prisma.connections.delete({ where: { guildId: connection.guildId } });
-  }
+  await Promise.all(
+    connections.map(async (connection) => {
+      await new Room(
+        gateway,
+        api,
+        connection.voiceChannelId,
+        connection.textChannelId,
+        connection.guildId,
+      )
+        .connect()
+        .catch(console.error);
+      await api.channels.createMessage(connection.textChannelId, {
+        embeds: [
+          {
+            description: "接続しました（再起動が終了しました）",
+            color: 0x00ff00,
+          },
+        ],
+      });
+      await prisma.connections.delete({
+        where: { guildId: connection.guildId },
+      });
+    }),
+  );
 
   console.log("ready!");
 

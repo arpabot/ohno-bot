@@ -24,32 +24,34 @@ const gateway = new WebSocketManager({
 const client = new Client({ rest, gateway });
 const prisma = new PrismaClient();
 const handleExit = async () => {
-  for (const room of roomManager.values()) {
-    await room.destroy();
-    await room.api.channels.createMessage(room.textChannelId, {
-      embeds: [
-        {
-          description:
-            "Bot が再起動されるためボイスチャンネルから切断しました．再起動後に再接続されます．",
-          color: 0xff0000,
+  await Promise.all(
+    [...roomManager.values()].map(async (room) => {
+      await room.destroy();
+      await room.api.channels.createMessage(room.textChannelId, {
+        embeds: [
+          {
+            description:
+              "Bot が再起動されるためボイスチャンネルから切断しました．再起動後に再接続されます．",
+            color: 0xff0000,
+          },
+        ],
+      });
+      await prisma.connections.upsert({
+        create: {
+          guildId: room.guildId,
+          textChannelId: room.textChannelId,
+          voiceChannelId: room.voiceChannelId,
         },
-      ],
-    });
-    await prisma.connections.upsert({
-      create: {
-        guildId: room.guildId,
-        textChannelId: room.textChannelId,
-        voiceChannelId: room.voiceChannelId,
-      },
-      update: {
-        textChannelId: room.textChannelId,
-        voiceChannelId: room.voiceChannelId,
-      },
-      where: {
-        guildId: room.guildId,
-      },
-    });
-  }
+        update: {
+          textChannelId: room.textChannelId,
+          voiceChannelId: room.voiceChannelId,
+        },
+        where: {
+          guildId: room.guildId,
+        },
+      });
+    }),
+  );
 
   process.exit(0);
 };

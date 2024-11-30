@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/arpabot/ohno-bot/compare/v1.0.4...v1.1.0) (2024-11-30)
+
+
+### Features
+
+* reconnect when process is restarted ([#54](https://github.com/arpabot/ohno-bot/issues/54)) ([374fc54](https://github.com/arpabot/ohno-bot/commit/374fc54371887e7cffb46ed593f612219899f2fc))
+
 ## [1.0.4](https://github.com/arpabot/ohno-bot/compare/v1.0.3...v1.0.4) (2024-11-30)
 
 

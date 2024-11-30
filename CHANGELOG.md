@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.4](https://github.com/arpabot/ohno-bot/compare/v1.0.3...v1.0.4) (2024-11-30)
+
+
+### Bug Fixes
+
+* **docs:** typo in README.md ([0292010](https://github.com/arpabot/ohno-bot/commit/0292010a3e2a1b045c4f69423e5e34d5f250e41c))
+
+
+### Performance Improvements
+
+* construct `AudioResource` manually ([e0ede5d](https://github.com/arpabot/ohno-bot/commit/e0ede5db5710f0951e0ebf874fc6db9e5946600e))
+
 ## [1.0.3](https://github.com/arpabot/ohno-bot/compare/v1.0.2...v1.0.3) (2024-11-21)
 
 

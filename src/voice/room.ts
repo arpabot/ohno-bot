@@ -1,5 +1,5 @@
 import { Readable } from "stream";
-import { API, APIMessage, GatewayVoiceState } from "@discordjs/core";
+import { API, APIMessage, APIVoiceState } from "@discordjs/core";
 import {
   AudioPlayerStatus,
   AudioResource,
@@ -109,8 +109,8 @@ export default class Room {
   }
 
   async handleVoiceStateUpdate(
-    oldState: GatewayVoiceState | undefined,
-    newState: GatewayVoiceState,
+    oldState: APIVoiceState | undefined,
+    newState: APIVoiceState,
   ) {
     if (newState.member?.user && newState.guild_id) {
       users.set(newState.user_id, newState.member.user);

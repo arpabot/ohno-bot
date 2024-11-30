@@ -2,12 +2,11 @@ import { Readable } from "stream";
 import { API, APIMessage, GatewayVoiceState } from "@discordjs/core";
 import {
   AudioPlayerStatus,
+  AudioResource,
   NoSubscriberBehavior,
-  StreamType,
   VoiceConnection,
   VoiceConnectionStatus,
   createAudioPlayer,
-  createAudioResource,
   entersState,
   joinVoiceChannel,
 } from "@discordjs/voice";
@@ -81,17 +80,18 @@ export default class Room {
         content = content.replaceAll(dict.word, dict.read);
       }
 
-      const resource = createAudioResource(
-        Readable.fromWeb(
-          (await synthesizer.synthesis(content)) ||
-            (() => {
-              throw "fuck";
-            })(),
-        ),
-        {
-          inputType: StreamType.OggOpus,
-          metadata: {},
-        },
+      const resource = new AudioResource(
+        [],
+        [
+          Readable.fromWeb(
+            (await synthesizer.synthesis(content)) ||
+              (() => {
+                throw "stream not found!";
+              })(),
+          ),
+        ],
+        {},
+        5,
       );
 
       this.audioPlayer.play(resource);

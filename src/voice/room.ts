@@ -12,6 +12,7 @@ import {
 } from "@discordjs/voice";
 import { WebSocketManager } from "@discordjs/ws";
 import { Mutex } from "async-mutex";
+import { opus } from "prism-media";
 import { channels, members, users } from "../commons/cache.js";
 import cleanContent from "../commons/cleanContent.js";
 import constructSpeakableMessage from "../commons/constructSpeakableMessage.js";
@@ -82,7 +83,11 @@ export default class Room {
 
       const resource = new AudioResource(
         [],
-        [Readable.fromWeb(await synthesizer.synthesis(content))],
+        [
+          Readable.fromWeb(await synthesizer.synthesis(content)).pipe(
+            new opus.OggDemuxer(),
+          ),
+        ],
         {},
         5,
       );

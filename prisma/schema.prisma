@@ -25,3 +25,9 @@ model Dictionary {
 
   @@unique([guildId, word])
 }
+
+model Connections {
+  guildId String @id
+  voiceChannelId String
+  textChannelId String
+}

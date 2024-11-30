@@ -8,10 +8,35 @@ import manifest from "../../.github/release-please/.release-please-manifest.json
   type: "json",
 };
 import { initCommands } from "../commands/init.js";
-import { client } from "../index.js";
+import { client, gateway } from "../index.js";
+import { prisma } from "../index.js";
+import Room from "../voice/room.js";
 
 export default async ({ api }: ToEventProps<GatewayReadyDispatchData>) => {
   await initCommands(api);
+
+  const connections = await prisma.connections.findMany();
+
+  for (const connection of connections) {
+    await new Room(
+      gateway,
+      api,
+      connection.voiceChannelId,
+      connection.textChannelId,
+      connection.guildId,
+    )
+      .connect()
+      .catch(console.error);
+    await api.channels.createMessage(connection.textChannelId, {
+      embeds: [
+        {
+          description: "接続しました（再起動が終了しました）",
+          color: 0x00ff00,
+        },
+      ],
+    });
+    await prisma.connections.delete({ where: { guildId: connection.guildId } });
+  }
 
   console.log("ready!");
 

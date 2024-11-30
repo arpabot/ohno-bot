@@ -82,14 +82,7 @@ export default class Room {
 
       const resource = new AudioResource(
         [],
-        [
-          Readable.fromWeb(
-            (await synthesizer.synthesis(content)) ||
-              (() => {
-                throw "stream not found!";
-              })(),
-          ),
-        ],
+        [Readable.fromWeb(await synthesizer.synthesis(content))],
         {},
         5,
       );

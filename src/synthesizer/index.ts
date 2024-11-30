@@ -50,6 +50,8 @@ export default class Synthesizer {
     });
 
     if (!res.ok) throw new Error("読み上げに失敗しました");
+    if (!res.body)
+      throw new Error("読み上げに失敗しました（body が帰ってきていません）");
 
     return res.body;
   }

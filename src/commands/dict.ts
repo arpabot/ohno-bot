@@ -8,8 +8,10 @@ import {
   APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandInteractionDataStringOption,
   APIApplicationCommandInteractionDataSubcommandOption,
+  APIApplicationCommandStringOption,
   APIChatInputApplicationCommandInteraction,
   APIInteractionGuildMember,
+  ApplicationCommandOptionType,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
 import { transmute } from "../commons/functions.js";
@@ -188,15 +190,21 @@ export default class Dict implements ICommand {
     if (command.name === "delete") {
       let cache = wordsCache.get(i.guild_id);
 
-      if (!cache) {
+      if (!cache || !cache.length) {
         cache = await prisma.dictionary.findMany({
           where: { guildId: i.guild_id },
         });
         wordsCache.set(i.guild_id, cache);
       }
 
+      const focusedOption = command.options?.find(
+        (x) => x.type === ApplicationCommandOptionType.String && x.focused,
+      ) as APIApplicationCommandInteractionDataStringOption | undefined;
+
       await api.interactions.createAutocompleteResponse(i.id, i.token, {
-        choices: cache.map((x) => ({ name: x.word, value: x.word })),
+        choices: cache
+          .filter((x) => x.word.startsWith(focusedOption?.value ?? ""))
+          .map((x) => ({ name: x.word, value: x.word })),
       });
     }
   }

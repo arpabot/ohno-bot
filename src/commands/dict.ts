@@ -5,6 +5,7 @@ import {
 } from "@discordjs/builders";
 import {
   API,
+  APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandInteractionDataStringOption,
   APIApplicationCommandInteractionDataSubcommandOption,
   APIChatInputApplicationCommandInteraction,
@@ -15,6 +16,11 @@ import { transmute } from "../commons/functions.js";
 import { NonNullableByKey } from "../commons/types.js";
 import { prisma } from "../index.js";
 import { ICommand } from "./index.js";
+
+const wordsCache = new Map<
+  string,
+  { word: string; read: string; guildId: string; id: number }[]
+>();
 
 export default class Dict implements ICommand {
   defition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
@@ -46,7 +52,8 @@ export default class Dict implements ICommand {
             new SlashCommandStringOption()
               .setName("word")
               .setDescription("単語")
-              .setRequired(true),
+              .setRequired(true)
+              .setAutocomplete(true),
           ),
       )
       .addSubcommand(
@@ -130,6 +137,7 @@ export default class Dict implements ICommand {
         });
 
       await prisma.dictionary.delete({ where: { id: dict.id } });
+      wordsCache.delete(i.guild_id);
 
       return await api.interactions.editReply(i.application_id, i.token, {
         embeds: [
@@ -165,6 +173,32 @@ export default class Dict implements ICommand {
     }
 
     throw "unreachable";
+  }
+
+  async autoComplete(
+    api: API,
+    i: APIApplicationCommandAutocompleteInteraction,
+  ) {
+    if (!i.guild_id) return;
+
+    const command = i.data.options.at(
+      0,
+    ) as APIApplicationCommandInteractionDataSubcommandOption;
+
+    if (command.name === "delete") {
+      let cache = wordsCache.get(i.guild_id);
+
+      if (!cache) {
+        cache = await prisma.dictionary.findMany({
+          where: { guildId: i.guild_id },
+        });
+        wordsCache.set(i.guild_id, cache);
+      }
+
+      await api.interactions.createAutocompleteResponse(i.id, i.token, {
+        choices: cache.map((x) => ({ name: x.word, value: x.word })),
+      });
+    }
   }
 }
 

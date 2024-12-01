@@ -1,5 +1,6 @@
 import {
   API,
+  APIApplicationCommandAutocompleteInteraction,
   APIChatInputApplicationCommandInteraction,
   APIInteractionGuildMember,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
@@ -33,4 +34,8 @@ export interface ICommand {
       APIInteractionGuildMember
     >,
   ): Promise<unknown>;
+  autoComplete?: (
+    api: API,
+    i: APIApplicationCommandAutocompleteInteraction,
+  ) => Promise<unknown>;
 }

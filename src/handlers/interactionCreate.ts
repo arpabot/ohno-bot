@@ -1,5 +1,6 @@
 import {
   GatewayInteractionCreateDispatchData,
+  InteractionType,
   MessageFlags,
   ToEventProps,
 } from "@discordjs/core";
@@ -11,30 +12,36 @@ export default async ({
   api,
   data,
 }: ToEventProps<GatewayInteractionCreateDispatchData>) => {
-  const error = await api.interactions
-    .defer(data.id, data.token)
-    .catch((x) => x as Error);
+  if (data.type === InteractionType.ApplicationCommandAutocomplete) {
+    const command = commands.find((x) => x.defition().name === data.data.name);
 
-  if (error) return console.error(error);
-  if (!validate(data)) return false;
+    command?.autoComplete?.(api, data);
+  } else if (data.type === InteractionType.ApplicationCommand) {
+    const error = await api.interactions
+      .defer(data.id, data.token)
+      .catch((x) => x as Error);
 
-  const command = commands.find((x) => x.defition().name === data.data.name);
+    if (error) return console.error(error);
+    if (!validate(data)) return false;
 
-  if (!command && data.data.name !== "help")
-    return await api.interactions.followUp(data.application_id, data.token, {
-      content: "古いコマンドを参照しています．世界を削除します．",
-      flags: MessageFlags.Ephemeral,
-    });
+    const command = commands.find((x) => x.defition().name === data.data.name);
 
-  try {
-    await (command ?? new Help()).run(api, data);
-  } catch (e) {
-    await api.interactions.followUp(data.application_id, data.token, {
-      content: `エラーです． \`\`\`${
-        e instanceof Error ? e.message : String(e)
-      }\`\`\``,
-      flags: MessageFlags.Ephemeral,
-    });
+    if (!command && data.data.name !== "help")
+      return await api.interactions.followUp(data.application_id, data.token, {
+        content: "古いコマンドを参照しています．世界を削除します．",
+        flags: MessageFlags.Ephemeral,
+      });
+
+    try {
+      await (command ?? new Help()).run(api, data);
+    } catch (e) {
+      await api.interactions.followUp(data.application_id, data.token, {
+        content: `エラーです． \`\`\`${
+          e instanceof Error ? e.message : String(e)
+        }\`\`\``,
+        flags: MessageFlags.Ephemeral,
+      });
+    }
   }
 
   return true;

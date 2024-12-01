@@ -8,7 +8,6 @@ import {
   APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandInteractionDataStringOption,
   APIApplicationCommandInteractionDataSubcommandOption,
-  APIApplicationCommandStringOption,
   APIChatInputApplicationCommandInteraction,
   APIInteractionGuildMember,
   ApplicationCommandOptionType,

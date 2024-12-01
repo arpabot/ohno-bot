@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/arpabot/ohno-bot/compare/v1.1.1...v1.2.0) (2024-12-01)
+
+
+### Features
+
+* implement autocomplete `/dict delete &lt;word&gt;` ([612484f](https://github.com/arpabot/ohno-bot/commit/612484f26e3161c2845551a34d5673a04cb5e39c))
+
+
+### Bug Fixes
+
+* `/dict delete &lt;word&gt;` autocomplete issue ([62e1bd7](https://github.com/arpabot/ohno-bot/commit/62e1bd78c9c4e1ac92adb9faf13827461e75deb6))
+
 ## [1.1.1](https://github.com/arpabot/ohno-bot/compare/v1.1.0...v1.1.1) (2024-12-01)
 
 

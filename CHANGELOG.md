@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/arpabot/ohno-bot/compare/v1.1.0...v1.1.1) (2024-12-01)
+
+
+### Bug Fixes
+
+* consider the case where a signal is sent twice ([158c435](https://github.com/arpabot/ohno-bot/commit/158c43526d0e2c9919c8f2aa1e4224677e579154))
+
 ## [1.1.0](https://github.com/arpabot/ohno-bot/compare/v1.0.4...v1.1.0) (2024-11-30)
 
 

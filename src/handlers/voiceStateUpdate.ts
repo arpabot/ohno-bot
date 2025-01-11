@@ -43,8 +43,8 @@ export default async ({
       if (data.guild_id && data.session_id && data.user_id) {
         adapters.get(data.guild_id)?.onVoiceStateUpdate(data);
 
-        if (!data.channel_id) {
-          if (room) {
+        if (room) {
+          if (!data.channel_id) {
             await __catch([
               room.destroy(),
               room.api.channels.createMessage(room.textChannelId, {
@@ -57,6 +57,8 @@ export default async ({
                 ],
               }),
             ]);
+          } else {
+            room.voiceChannelId = data.channel_id;
           }
         }
       }

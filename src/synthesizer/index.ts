@@ -49,7 +49,10 @@ export default class Synthesizer {
       },
     });
 
-    if (!res.ok) throw new Error("読み上げに失敗しました");
+    if (!res.ok) {
+      console.error("synthesis error: ", await res.text());
+      throw new Error("読み上げに失敗しました");
+    }
     if (!res.body)
       throw new Error("読み上げに失敗しました（body が帰ってきていません）");
 

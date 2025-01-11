@@ -10,7 +10,7 @@ import manifest from "../../.github/release-please/.release-please-manifest.json
 import { initCommands } from "../commands/init.js";
 import { client, gateway } from "../index.js";
 import { prisma } from "../index.js";
-import Room from "../voice/room.js";
+import Room, { roomManager } from "../voice/room.js";
 
 export default async ({ api }: ToEventProps<GatewayReadyDispatchData>) => {
   await initCommands(api);
@@ -19,26 +19,36 @@ export default async ({ api }: ToEventProps<GatewayReadyDispatchData>) => {
 
   await Promise.all(
     connections.map(async (connection) => {
-      await new Room(
-        gateway,
-        api,
-        connection.voiceChannelId,
-        connection.textChannelId,
-        connection.guildId,
-      )
-        .connect()
-        .catch(console.error);
-      await api.channels.createMessage(connection.textChannelId, {
-        embeds: [
-          {
-            description: "接続しました（再起動が終了しました）",
-            color: 0x00ff00,
-          },
-        ],
-      });
-      await prisma.connections.delete({
-        where: { guildId: connection.guildId },
-      });
+      try {
+        await new Room(
+          gateway,
+          api,
+          connection.voiceChannelId,
+          connection.textChannelId,
+          connection.guildId,
+        ).connect();
+        await api.channels.createMessage(connection.textChannelId, {
+          embeds: [
+            {
+              description: "接続しました（再起動が終了しました）",
+              color: 0x00ff00,
+            },
+          ],
+        });
+      } catch (e) {
+        roomManager.delete(connection.guildId);
+        console.error(
+          "at ready: ",
+          connection.guildId,
+          connection.voiceChannelId,
+          "failed to connect",
+        );
+        console.error(e);
+      } finally {
+        await prisma.connections.delete({
+          where: { guildId: connection.guildId },
+        });
+      }
     }),
   );
 

@@ -34,9 +34,7 @@ export default class Room {
     private audioPlayer = createAudioPlayer({
       behaviors: { noSubscriber: NoSubscriberBehavior.Play },
     }),
-  ) {
-    roomManager.set(guildId, this);
-  }
+  ) {}
 
   async connect() {
     this.connection = joinVoiceChannel({
@@ -47,6 +45,8 @@ export default class Room {
     this.connection?.subscribe(this.audioPlayer);
 
     await entersState(this.connection, VoiceConnectionStatus.Ready, 10_000);
+
+    roomManager.set(this.guildId, this);
   }
 
   async destroy() {

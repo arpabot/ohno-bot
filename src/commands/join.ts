@@ -88,16 +88,27 @@ export default class Join implements ICommand {
       ],
     });
 
-    await room.connect();
-
-    return await api.interactions.editReply(i.application_id, i.token, {
-      content: "",
-      embeds: [
-        {
-          description: "接続しました",
-          color: 0x00ff00,
-        },
-      ],
-    });
+    try {
+      await room.connect();
+      await api.interactions.editReply(i.application_id, i.token, {
+        content: "",
+        embeds: [
+          {
+            description: "接続しました",
+            color: 0x00ff00,
+          },
+        ],
+      });
+    } catch (e) {
+      await api.interactions.editReply(i.application_id, i.token, {
+        content: "",
+        embeds: [
+          {
+            description: `接続に失敗しました: \n\`\`\`\n${String(e)}\n\`\`\``,
+            color: 0xff0000,
+          },
+        ],
+      });
+    }
   }
 }

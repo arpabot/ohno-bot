@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.2.1](https://github.com/arpabot/ohno-bot/compare/v1.2.0...v1.2.1) (2025-01-11)
+
+
+### Bug Fixes
+
+* error message when `/join` ([855dbdf](https://github.com/arpabot/ohno-bot/commit/855dbdf427dfb45c9f77a5a050b28263b799a592))
+* improper behavior when processing `voiceStateUpdate` ([8dbeb7f](https://github.com/arpabot/ohno-bot/commit/8dbeb7fd0ae1901e2600d417c461608cf475943f))
+* insane behavior ([e3fc933](https://github.com/arpabot/ohno-bot/commit/e3fc9339559d9ff5f8c99fc9990b491ece6dd6a5))
+
 ## [1.2.0](https://github.com/arpabot/ohno-bot/compare/v1.1.1...v1.2.0) (2024-12-01)
 
 

@@ -21,7 +21,7 @@ export const voices = Object.fromEntries(
 export default class Synthesizer {
   constructor(
     private key: string,
-    private region: string,
+    private endpoint: string,
     public voice: string,
     public userId: string,
     public pitch: number,
@@ -50,9 +50,14 @@ export default class Synthesizer {
     });
 
     if (!res.ok) {
-      console.error("synthesis error: ", await res.text());
+      console.error(
+        `Synthesis error (${res.status} ${
+          res.statusText
+        }): ${await res.text()}`,
+      );
       throw new Error("読み上げに失敗しました");
     }
+
     if (!res.body)
       throw new Error("読み上げに失敗しました（body が帰ってきていません）");
 
@@ -60,6 +65,6 @@ export default class Synthesizer {
   }
 
   baseURL(route: string) {
-    return `https://${this.region}.tts.speech.microsoft.com/cognitiveservices/${route}`;
+    return `${this.endpoint}/cognitiveservices/${route}`;
   }
 }

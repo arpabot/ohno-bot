@@ -68,7 +68,7 @@ export default class Room {
       });
       const synthesizer = new Synthesizer(
         expect(process.env["key"]),
-        expect(process.env["region"]),
+        expect(process.env["endpoint"]),
         userConfig?.voice ?? "ja-JP-NanamiNeural",
         message.author.id,
         userConfig?.pitch ?? 1,

@@ -1,11 +1,8 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import {
-  MessageFlags,
-  type RESTPostAPIChatInputApplicationCommandsJSONBody,
-} from "@discordjs/core";
+import type { RESTPostAPIChatInputApplicationCommandsJSONBody } from "@discordjs/core";
 import { voiceStates } from "../commons/cache.js";
 import { roomManager } from "../voice/room.js";
-import { type CommandContext, type ICommand, replySuccess } from "./base.js";
+import { type CommandContext, type ICommand, replyError } from "./base.js";
 
 export default class Leave implements ICommand {
   definition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
@@ -24,20 +21,21 @@ export default class Leave implements ICommand {
     const room = roomManager.get(i.guild_id);
 
     if (state?.channel_id !== room?.voiceChannelId) {
-      return api.interactions.editReply(i.application_id, i.token, {
-        embeds: [
-          {
-            description:
-              "あなたが Bot と同じボイスチャンネルにいないかあなたがボイスチャンネルにいません",
-            color: 0xff00ff,
-          },
-        ],
-        flags: MessageFlags.Ephemeral,
-      });
+      return replyError(
+        ctx,
+        "あなたが Bot と同じボイスチャンネルにいないかあなたがボイスチャンネルにいません",
+      );
     }
 
     await room?.destroy();
 
-    return replySuccess(ctx, "退出", "退出しました");
+    return api.interactions.editReply(i.application_id, i.token, {
+      embeds: [
+        {
+          description: "退出しました",
+          color: 0x00ff00,
+        },
+      ],
+    });
   }
 }

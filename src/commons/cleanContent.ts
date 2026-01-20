@@ -12,8 +12,13 @@ const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
 
 type ASTNode = SingleASTNode | SingleASTNode[];
 
+export interface CleanContentOptions {
+  readUrls?: boolean;
+}
+
 interface CleanContext {
   guildId: string | undefined;
+  readUrls: boolean;
 }
 
 interface DiscordUrl {
@@ -24,9 +29,13 @@ interface DiscordUrl {
 
 export default function cleanContent(
   message: SpeakableMessage & { guild_id?: string },
+  options?: CleanContentOptions,
 ): string {
   const ast = parse(message.content, "extended");
-  const ctx: CleanContext = { guildId: message.guild_id };
+  const ctx: CleanContext = {
+    guildId: message.guild_id,
+    readUrls: options?.readUrls ?? true,
+  };
   const cleaned = astToText(ast, ctx);
 
   return cleaned.slice(0, 200);
@@ -62,6 +71,10 @@ function astToText(ast: ASTNode, ctx: CleanContext): string {
 
     case "url":
     case "autolink": {
+      if (!ctx.readUrls) {
+        return "";
+      }
+
       const target = getString(getNodeProp(node, "target"));
       const discordUrl = parseDiscordUrl(target);
 

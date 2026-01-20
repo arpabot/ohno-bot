@@ -2,17 +2,17 @@ import {
   SlashCommandStringOption,
   SlashCommandSubcommandBuilder,
 } from "@discordjs/builders";
-import { db } from "../../db/index.js";
+import { db } from "../../../db/index.js";
 import {
   getRequiredOption,
   type ISubcommandHandler,
   replySuccess,
   type SubcommandContext,
-} from "../base.js";
+} from "../../base.js";
 import { wordsCache } from "./shared.js";
 
-export const putSubcommand = new SlashCommandSubcommandBuilder()
-  .setName("put")
+export const dictPutSubcommand = new SlashCommandSubcommandBuilder()
+  .setName("dict-put")
   .setDescription("サーバーの辞書を追加・編集します")
   .addStringOption(
     new SlashCommandStringOption()
@@ -27,7 +27,7 @@ export const putSubcommand = new SlashCommandSubcommandBuilder()
       .setRequired(true),
   );
 
-export const putHandler: ISubcommandHandler = {
+export const dictPutHandler: ISubcommandHandler = {
   async run(ctx: SubcommandContext): Promise<unknown> {
     const guildId = ctx.interaction.guild_id;
     const word = getRequiredOption<string>(ctx.options, "word");

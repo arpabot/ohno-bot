@@ -14,14 +14,16 @@ import type { WebSocketManager } from "@discordjs/ws";
 import { Mutex } from "async-mutex";
 import { opus } from "prism-media";
 import { channels, members, users } from "../commons/cache.js";
-import cleanContent from "../commons/cleanContent.js";
+import cleanContent, {
+  type CleanContentOptions,
+} from "../commons/cleanContent.js";
 import { TIMEOUTS } from "../commons/constants.js";
 import constructSpeakableMessage, {
   type SpeakableMessage,
 } from "../commons/constructSpeakableMessage.js";
 import { BOT_USER_ID, env } from "../commons/env.js";
 import { getDisplayName } from "../commons/user.js";
-import { db } from "../db/index.js";
+import { db, getDefaultGuildSettings } from "../db/index.js";
 import Synthesizer from "../synthesizer/index.js";
 import voiceAdapterCreator from "./voiceAdapterCreator.js";
 
@@ -65,7 +67,10 @@ export default class Room {
     roomManager.delete(this.guildId);
   }
 
-  async speak(message: SpeakableMessage): Promise<void> {
+  async speak(
+    message: SpeakableMessage,
+    options?: CleanContentOptions,
+  ): Promise<void> {
     const release = await this.audioResourceLock.acquire();
 
     try {
@@ -79,7 +84,7 @@ export default class Room {
         userConfig?.speed ?? 1,
       );
 
-      let content = cleanContent(message);
+      let content = cleanContent(message, options);
 
       const sortedDictionaries = [...dictionaries].sort(
         (a, b) => b.word.length - a.word.length,
@@ -142,17 +147,23 @@ export default class Room {
       return;
     }
 
+    const settings =
+      (await db.guildSettings.findByGuildId(newState.guild_id)) ??
+      getDefaultGuildSettings(newState.guild_id);
+
     if (
       oldState?.channel_id !== this.voiceChannelId &&
       newState.channel_id === this.voiceChannelId
     ) {
-      const message = constructSpeakableMessage(
-        `${getDisplayName(newState.guild_id, newState.user_id)}が入室しました`,
-        newState.user_id,
-        newState.guild_id,
-      );
+      if (settings.announceJoinLeave) {
+        const message = constructSpeakableMessage(
+          `${getDisplayName(newState.guild_id, newState.user_id)}が入室しました`,
+          newState.user_id,
+          newState.guild_id,
+        );
 
-      await this.speak(message);
+        await this.speak(message);
+      }
     }
 
     if (
@@ -161,25 +172,29 @@ export default class Room {
       newState.channel_id !== this.voiceChannelId &&
       newState.channel_id
     ) {
-      const message = constructSpeakableMessage(
-        `${getDisplayName(newState.guild_id, newState.user_id)}が${
-          channels.get(newState.channel_id)?.name ?? "不明なチャンネル"
-        }へ移動しました`,
-        newState.user_id,
-        newState.guild_id,
-      );
+      if (settings.announceMove) {
+        const message = constructSpeakableMessage(
+          `${getDisplayName(newState.guild_id, newState.user_id)}が${
+            channels.get(newState.channel_id)?.name ?? "不明なチャンネル"
+          }へ移動しました`,
+          newState.user_id,
+          newState.guild_id,
+        );
 
-      await this.speak(message);
+        await this.speak(message);
+      }
     }
 
     if (oldState?.channel_id === this.voiceChannelId && !newState.channel_id) {
-      const message = constructSpeakableMessage(
-        `${getDisplayName(newState.guild_id, newState.user_id)}が退出しました`,
-        newState.user_id,
-        newState.guild_id,
-      );
+      if (settings.announceJoinLeave) {
+        const message = constructSpeakableMessage(
+          `${getDisplayName(newState.guild_id, newState.user_id)}が退出しました`,
+          newState.user_id,
+          newState.guild_id,
+        );
 
-      await this.speak(message);
+        await this.speak(message);
+      }
     }
 
     if (
@@ -189,12 +204,31 @@ export default class Room {
     ) {
       const changes: string[] = [];
 
-      if (oldState.self_stream !== newState.self_stream) {
+      if (
+        settings.announceScreenShare &&
+        oldState.self_stream !== newState.self_stream
+      ) {
         changes.push(`画面共有を${newState.self_stream ? "開始" : "終了"}`);
       }
 
-      if (oldState.self_video !== newState.self_video) {
+      if (
+        settings.announceCamera &&
+        oldState.self_video !== newState.self_video
+      ) {
         changes.push(`カメラを${newState.self_video ? "オン" : "オフ"}に`);
+      }
+
+      if (settings.announceMute && oldState.self_mute !== newState.self_mute) {
+        changes.push(`ミュートを${newState.self_mute ? "オン" : "オフ"}に`);
+      }
+
+      if (
+        settings.announceDeafen &&
+        oldState.self_deaf !== newState.self_deaf
+      ) {
+        changes.push(
+          `スピーカーミュートを${newState.self_deaf ? "オン" : "オフ"}に`,
+        );
       }
 
       if (changes.length === 0) {

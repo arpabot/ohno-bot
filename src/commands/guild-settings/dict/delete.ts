@@ -7,7 +7,7 @@ import type {
   APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandInteractionDataBasicOption,
 } from "@discordjs/core";
-import { type DictionaryEntry, db } from "../../db/index.js";
+import { type DictionaryEntry, db } from "../../../db/index.js";
 import {
   getFocusedOption,
   getRequiredOption,
@@ -15,11 +15,11 @@ import {
   replyError,
   replySuccess,
   type SubcommandContext,
-} from "../base.js";
+} from "../../base.js";
 import { wordsCache } from "./shared.js";
 
-export const deleteSubcommand = new SlashCommandSubcommandBuilder()
-  .setName("delete")
+export const dictDeleteSubcommand = new SlashCommandSubcommandBuilder()
+  .setName("dict-delete")
   .setDescription("サーバーの辞書を削除します")
   .addStringOption(
     new SlashCommandStringOption()
@@ -29,7 +29,7 @@ export const deleteSubcommand = new SlashCommandSubcommandBuilder()
       .setAutocomplete(true),
   );
 
-export const deleteHandler: ISubcommandHandler = {
+export const dictDeleteHandler: ISubcommandHandler = {
   async run(ctx: SubcommandContext): Promise<unknown> {
     const guildId = ctx.interaction.guild_id;
     const word = getRequiredOption<string>(ctx.options, "word");

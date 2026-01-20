@@ -16,3 +16,17 @@ export interface Connection {
   voiceChannelId: string;
   textChannelId: string;
 }
+
+export interface GuildSettings {
+  guildId: string;
+  announceJoinLeave: boolean;
+  announceMove: boolean;
+  announceScreenShare: boolean;
+  announceCamera: boolean;
+  announceMute: boolean;
+  announceDeafen: boolean;
+  readBotMessages: boolean;
+  readStickers: boolean;
+  readAttachments: boolean;
+  readUrls: boolean;
+}

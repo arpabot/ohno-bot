@@ -30,6 +30,7 @@ export interface SubcommandContext extends CommandContext {
 }
 
 export interface ICommand {
+  ephemeral?: boolean;
   definition(): RESTPostAPIChatInputApplicationCommandsJSONBody;
   run(ctx: CommandContext): Promise<unknown>;
   autoComplete?(

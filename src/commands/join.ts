@@ -1,8 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import {
-  MessageFlags,
-  type RESTPostAPIChatInputApplicationCommandsJSONBody,
-} from "@discordjs/core";
+import type { RESTPostAPIChatInputApplicationCommandsJSONBody } from "@discordjs/core";
 import { voiceStates } from "../commons/cache.js";
 import { gateway } from "../index.js";
 import Room, { roomManager } from "../voice/room.js";
@@ -22,43 +19,22 @@ export default class Join implements ICommand {
     const { api, interaction: i } = ctx;
 
     if (roomManager.get(i.guild_id)) {
-      return api.interactions.editReply(i.application_id, i.token, {
-        embeds: [
-          {
-            color: 0xff0000,
-            description: "すでに Bot が別のボイスチャンネルに接続しています",
-          },
-        ],
-        flags: MessageFlags.Ephemeral,
-      });
+      return replyError(
+        ctx,
+        "すでに Bot が別のボイスチャンネルに接続しています",
+      );
     }
 
     const states = voiceStates.get(i.guild_id);
 
     if (!states) {
-      return api.interactions.editReply(i.application_id, i.token, {
-        embeds: [
-          {
-            color: 0xff0000,
-            description: "あなたはボイスチャンネルに接続していません",
-          },
-        ],
-        flags: MessageFlags.Ephemeral,
-      });
+      return replyError(ctx, "あなたはボイスチャンネルに接続していません");
     }
 
     const state = states.find((x) => x.user_id === i.member.user.id);
 
     if (!state || !state.channel_id) {
-      return api.interactions.editReply(i.application_id, i.token, {
-        embeds: [
-          {
-            color: 0xff0000,
-            description: "あなたはボイスチャンネルに接続していません",
-          },
-        ],
-        flags: MessageFlags.Ephemeral,
-      });
+      return replyError(ctx, "あなたはボイスチャンネルに接続していません");
     }
 
     const room = new Room(
@@ -69,22 +45,19 @@ export default class Join implements ICommand {
       i.guild_id,
     );
 
-    api.interactions
-      .editReply(i.application_id, i.token, {
-        embeds: [
-          {
-            description: "接続しています...",
-            color: 0xffff00,
-          },
-        ],
-      })
-      .catch(console.error);
+    await api.interactions.editReply(i.application_id, i.token, {
+      embeds: [
+        {
+          description: "接続しています...",
+          color: 0xffff00,
+        },
+      ],
+    });
 
     try {
       await room.connect();
 
       return api.interactions.editReply(i.application_id, i.token, {
-        content: "",
         embeds: [
           {
             description: "接続しました",

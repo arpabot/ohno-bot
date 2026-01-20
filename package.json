@@ -16,7 +16,7 @@
     "@biomejs/biome": "1.5.3",
     "@discordjs/builders": "^1.9.0",
     "@discordjs/core": "2.0.0",
-    "@discordjs/opus": "^0.9.0",
+    "@discordjs/opus": "^0.10.0",
     "@discordjs/rest": "2.4.0",
     "@discordjs/voice": "0.18.0",
     "@discordjs/ws": "2.0.0",

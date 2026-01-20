@@ -1,5 +1,5 @@
-import { RingCache } from "../../commons/cache.js";
-import type { DictionaryEntry } from "../../db/index.js";
+import { RingCache } from "../../../commons/cache.js";
+import type { DictionaryEntry } from "../../../db/index.js";
 
 export const wordsCache = new RingCache<string, DictionaryEntry[]>(500);
 

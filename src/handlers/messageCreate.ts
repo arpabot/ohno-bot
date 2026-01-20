@@ -3,6 +3,7 @@ import type {
   ToEventProps,
 } from "@discordjs/core";
 import type { SpeakableMessage } from "../commons/constructSpeakableMessage.js";
+import { db, getDefaultGuildSettings } from "../db/index.js";
 import { roomManager } from "../voice/room.js";
 
 const mimeMap: Record<string, string> = {
@@ -42,13 +43,23 @@ export default async ({
     return;
   }
 
-  const attachment = data.attachments.at(0);
+  const settings =
+    (await db.guildSettings.findByGuildId(data.guild_id)) ??
+    getDefaultGuildSettings(data.guild_id);
 
-  for (const sticker of data.sticker_items ?? []) {
-    data.content = `${sticker.name} ${data.content}`;
+  if (data.author.bot && !settings.readBotMessages) {
+    return;
   }
 
-  if (attachment) {
+  const attachment = data.attachments.at(0);
+
+  if (settings.readStickers) {
+    for (const sticker of data.sticker_items ?? []) {
+      data.content = `${sticker.name} ${data.content}`;
+    }
+  }
+
+  if (settings.readAttachments && attachment) {
     data.content = `${
       mimeMap[(attachment.content_type ?? "").split("/").at(0) ?? ""] ??
       "データ"
@@ -61,7 +72,7 @@ export default async ({
     author: { id: data.author.id },
   };
 
-  room.speak(message).catch((e) => {
+  room.speak(message, { readUrls: settings.readUrls }).catch((e) => {
     if (e instanceof Error && e.message === "request for lock canceled") {
       return;
     }

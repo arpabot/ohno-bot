@@ -2,15 +2,16 @@ import {
   SlashCommandBuilder,
   SlashCommandStringOption,
 } from "@discordjs/builders";
-import {
-  type APIApplicationCommandInteractionDataStringOption,
-  MessageFlags,
-  type RESTPostAPIChatInputApplicationCommandsJSONBody,
+import type {
+  APIApplicationCommandInteractionDataStringOption,
+  RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
 import type { CommandContext, ICommand } from "./base.js";
 import { commands } from "./index.js";
 
 export default class Help implements ICommand {
+  ephemeral = true;
+
   definition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
     return new SlashCommandBuilder()
       .setName("help")
@@ -48,7 +49,6 @@ export default class Help implements ICommand {
             color: 0x00ff00,
           },
         ],
-        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -66,7 +66,6 @@ export default class Help implements ICommand {
           color: 0x00ff00,
         },
       ],
-      flags: MessageFlags.Ephemeral,
     });
   }
 }

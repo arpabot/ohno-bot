@@ -23,8 +23,14 @@ export default async ({
   }
 
   if (data.type === InteractionType.ApplicationCommand) {
+    const command = commands.find(
+      (x) => x.definition().name === data.data.name,
+    );
+    const handler = command ?? new Help();
     const error = await api.interactions
-      .defer(data.id, data.token)
+      .defer(data.id, data.token, {
+        flags: handler.ephemeral ? MessageFlags.Ephemeral : undefined,
+      })
       .catch((x) => x as Error);
 
     if (error) {
@@ -37,10 +43,6 @@ export default async ({
       return false;
     }
 
-    const command = commands.find(
-      (x) => x.definition().name === data.data.name,
-    );
-
     if (!command && data.data.name !== "help") {
       await api.interactions.followUp(data.application_id, data.token, {
         content: "古いコマンドを参照しています．世界を削除します．",
@@ -51,8 +53,6 @@ export default async ({
     }
 
     try {
-      const handler = command ?? new Help();
-
       await handler.run({ api, interaction: data });
     } catch (e) {
       await api.interactions.followUp(data.application_id, data.token, {

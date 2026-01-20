@@ -1,11 +1,10 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import {
-  MessageFlags,
-  type RESTPostAPIChatInputApplicationCommandsJSONBody,
-} from "@discordjs/core";
+import type { RESTPostAPIChatInputApplicationCommandsJSONBody } from "@discordjs/core";
 import type { CommandContext, ICommand } from "./base.js";
 
 export default class Ping implements ICommand {
+  ephemeral = true;
+
   definition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
     return new SlashCommandBuilder()
       .setName("ping")
@@ -17,10 +16,7 @@ export default class Ping implements ICommand {
     return ctx.api.interactions.editReply(
       ctx.interaction.application_id,
       ctx.interaction.token,
-      {
-        content: "Pong!",
-        flags: MessageFlags.Ephemeral,
-      },
+      { content: "Pong!" },
     );
   }
 }

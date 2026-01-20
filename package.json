@@ -20,7 +20,7 @@
     "@discordjs/rest": "2.4.0",
     "@discordjs/voice": "0.18.0",
     "@discordjs/ws": "2.0.0",
-    "@swc/cli": "^0.3.14",
+    "@swc/cli": "^0.7.0",
     "@swc/core": "^1.9.2",
     "@tsconfig/node20": "^20.1.4",
     "@tsconfig/strictest": "^2.0.5",

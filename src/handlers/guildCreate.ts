@@ -1,9 +1,9 @@
 import {
-  APIGuildMember,
-  APIUser,
-  GatewayGuildCreateDispatchData,
+  type APIGuildMember,
+  type APIUser,
+  type GatewayGuildCreateDispatchData,
   GatewayOpcodes,
-  ToEventProps,
+  type ToEventProps,
 } from "@discordjs/core";
 import {
   channels,
@@ -12,12 +12,12 @@ import {
   users,
   voiceStates,
 } from "../commons/cache.js";
-import { NonNullableByKey } from "../commons/types.js";
+import type { NonNullableByKey } from "../commons/types.js";
 import { gateway } from "../index.js";
 
 export default async ({
   data,
-}: ToEventProps<GatewayGuildCreateDispatchData>) => {
+}: ToEventProps<GatewayGuildCreateDispatchData>): Promise<void> => {
   gateway.send(
     Number(BigInt(data.id) >> 22n) % (await gateway.getShardCount()),
     {
@@ -31,7 +31,9 @@ export default async ({
   );
 
   for (const member of data.members) {
-    if (!member.user) continue;
+    if (!member.user) {
+      continue;
+    }
 
     members.set(data.id, member.user.id, {
       guild_id: data.id,

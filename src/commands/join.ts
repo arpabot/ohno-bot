@@ -1,19 +1,15 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import {
-  API,
-  APIChatInputApplicationCommandInteraction,
-  APIInteractionGuildMember,
   MessageFlags,
-  RESTPostAPIChatInputApplicationCommandsJSONBody,
+  type RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
 import { voiceStates } from "../commons/cache.js";
-import { NonNullableByKey } from "../commons/types.js";
 import { gateway } from "../index.js";
 import Room, { roomManager } from "../voice/room.js";
-import { type ICommand } from "./index.js";
+import { type CommandContext, type ICommand, replyError } from "./base.js";
 
 export default class Join implements ICommand {
-  defition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
+  definition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
     return new SlashCommandBuilder()
       .setName("join")
       .setDescription("ボイスチャンネルに参加します")
@@ -22,20 +18,11 @@ export default class Join implements ICommand {
       .toJSON();
   }
 
-  async run(
-    api: API,
-    i: NonNullableByKey<
-      NonNullableByKey<
-        APIChatInputApplicationCommandInteraction,
-        "guild_id",
-        string
-      >,
-      "member",
-      APIInteractionGuildMember
-    >,
-  ): Promise<unknown> {
-    if (roomManager.get(i.guild_id))
-      return await api.interactions.editReply(i.application_id, i.token, {
+  async run(ctx: CommandContext): Promise<unknown> {
+    const { api, interaction: i } = ctx;
+
+    if (roomManager.get(i.guild_id)) {
+      return api.interactions.editReply(i.application_id, i.token, {
         embeds: [
           {
             color: 0xff0000,
@@ -44,11 +31,12 @@ export default class Join implements ICommand {
         ],
         flags: MessageFlags.Ephemeral,
       });
+    }
 
     const states = voiceStates.get(i.guild_id);
 
-    if (!states)
-      return await api.interactions.editReply(i.application_id, i.token, {
+    if (!states) {
+      return api.interactions.editReply(i.application_id, i.token, {
         embeds: [
           {
             color: 0xff0000,
@@ -57,11 +45,12 @@ export default class Join implements ICommand {
         ],
         flags: MessageFlags.Ephemeral,
       });
+    }
 
     const state = states.find((x) => x.user_id === i.member.user.id);
 
-    if (!state || !state.channel_id)
-      return await api.interactions.editReply(i.application_id, i.token, {
+    if (!state || !state.channel_id) {
+      return api.interactions.editReply(i.application_id, i.token, {
         embeds: [
           {
             color: 0xff0000,
@@ -70,6 +59,7 @@ export default class Join implements ICommand {
         ],
         flags: MessageFlags.Ephemeral,
       });
+    }
 
     const room = new Room(
       gateway,
@@ -79,18 +69,21 @@ export default class Join implements ICommand {
       i.guild_id,
     );
 
-    api.interactions.editReply(i.application_id, i.token, {
-      embeds: [
-        {
-          description: "接続しています...",
-          color: 0xffff00,
-        },
-      ],
-    });
+    api.interactions
+      .editReply(i.application_id, i.token, {
+        embeds: [
+          {
+            description: "接続しています...",
+            color: 0xffff00,
+          },
+        ],
+      })
+      .catch(console.error);
 
     try {
       await room.connect();
-      await api.interactions.editReply(i.application_id, i.token, {
+
+      return api.interactions.editReply(i.application_id, i.token, {
         content: "",
         embeds: [
           {
@@ -100,15 +93,10 @@ export default class Join implements ICommand {
         ],
       });
     } catch (e) {
-      await api.interactions.editReply(i.application_id, i.token, {
-        content: "",
-        embeds: [
-          {
-            description: `接続に失敗しました: \n\`\`\`\n${String(e)}\n\`\`\``,
-            color: 0xff0000,
-          },
-        ],
-      });
+      return replyError(
+        ctx,
+        `接続に失敗しました: \n\`\`\`\n${String(e)}\n\`\`\``,
+      );
     }
   }
 }

@@ -1,20 +1,24 @@
-import {
+import type {
   GatewayVoiceStateUpdateDispatchData,
   ToEventProps,
 } from "@discordjs/core";
 import { Mutex } from "async-mutex";
 import { voiceStates } from "../commons/cache.js";
-import { __catch, expect } from "../commons/functions.js";
+import { BOT_USER_ID } from "../commons/env.js";
+import { catchAll } from "../commons/functions.js";
 import { roomManager } from "../voice/room.js";
 import { adapters } from "../voice/voiceAdapterCreator.js";
 
-const lock = new Mutex();
+const guildLocks = new Map<string, Mutex>();
 
 export default async ({
   data,
-}: ToEventProps<GatewayVoiceStateUpdateDispatchData>) => {
-  if (!data.guild_id) return;
+}: ToEventProps<GatewayVoiceStateUpdateDispatchData>): Promise<boolean> => {
+  if (!data.guild_id) {
+    return true;
+  }
 
+  const lock = getGuildLock(data.guild_id);
   const release = await lock.acquire();
 
   try {
@@ -30,22 +34,13 @@ export default async ({
       states.push(data);
     }
 
-    if (
-      data.member?.user?.id ===
-      atob(
-        expect(
-          expect<string | undefined, string>(process.env["token"])
-            .split(".")
-            .at(0),
-        ),
-      )
-    ) {
+    if (data.member?.user?.id === BOT_USER_ID) {
       if (data.guild_id && data.session_id && data.user_id) {
         adapters.get(data.guild_id)?.onVoiceStateUpdate(data);
 
         if (room) {
           if (!data.channel_id) {
-            await __catch([
+            await catchAll([
               room.destroy(),
               room.api.channels.createMessage(room.textChannelId, {
                 embeds: [
@@ -71,3 +66,14 @@ export default async ({
 
   return true;
 };
+
+function getGuildLock(guildId: string): Mutex {
+  let lock = guildLocks.get(guildId);
+
+  if (!lock) {
+    lock = new Mutex();
+    guildLocks.set(guildId, lock);
+  }
+
+  return lock;
+}

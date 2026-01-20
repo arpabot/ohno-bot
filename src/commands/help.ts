@@ -3,19 +3,15 @@ import {
   SlashCommandStringOption,
 } from "@discordjs/builders";
 import {
-  API,
-  APIApplicationCommandStringOption,
-  APIChatInputApplicationCommandInteraction,
-  APIInteractionGuildMember,
+  type APIApplicationCommandInteractionDataStringOption,
   MessageFlags,
-  RESTPostAPIChatInputApplicationCommandsJSONBody,
+  type RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
-import { transmute } from "../commons/functions.js";
-import { NonNullableByKey } from "../commons/types.js";
-import { type ICommand, commands } from "./index.js";
+import type { CommandContext, ICommand } from "./base.js";
+import { commands } from "./index.js";
 
 export default class Help implements ICommand {
-  defition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
+  definition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
     return new SlashCommandBuilder()
       .setName("help")
       .setDescription("コマンドのヘルプを表示します")
@@ -23,41 +19,32 @@ export default class Help implements ICommand {
         new SlashCommandStringOption()
           .setName("name")
           .addChoices(
-            ...commands.map((x) => {
-              return { name: x.defition().name, value: x.defition().name };
-            }),
+            ...commands.map((x) => ({
+              name: x.definition().name,
+              value: x.definition().name,
+            })),
           )
           .setDescription("コマンド名"),
       )
       .toJSON();
   }
 
-  async run(
-    api: API,
-    i: NonNullableByKey<
-      NonNullableByKey<
-        APIChatInputApplicationCommandInteraction,
-        "guild_id",
-        string
-      >,
-      "member",
-      APIInteractionGuildMember
-    >,
-  ): Promise<unknown> {
-    const name = i.data.options?.[0];
+  async run(ctx: CommandContext): Promise<unknown> {
+    const { api, interaction: i } = ctx;
+    const name = i.data.options?.[0] as
+      | APIApplicationCommandInteractionDataStringOption
+      | undefined;
 
-    if (!transmute<APIApplicationCommandStringOption>(name)) {
-      return await api.interactions.editReply(i.application_id, i.token, {
+    if (name == null) {
+      return api.interactions.editReply(i.application_id, i.token, {
         embeds: [
           {
             fields: commands
-              .map((x) => x.defition())
-              .map((x) => {
-                return {
-                  name: `/${x.name}`,
-                  value: x.description,
-                };
-              }),
+              .map((x) => x.definition())
+              .map((x) => ({
+                name: `/${x.name}`,
+                value: x.description,
+              })),
             color: 0x00ff00,
           },
         ],
@@ -65,15 +52,17 @@ export default class Help implements ICommand {
       });
     }
 
-    const command = commands.find((x) => x.defition().name === name.value);
+    const command = commands.find((x) => x.definition().name === name.value);
 
-    if (!transmute<ICommand>(command)) throw "unreachable";
+    if (command == null) {
+      throw new Error(`Command not found: ${name.value}`);
+    }
 
-    return await api.interactions.editReply(i.application_id, i.token, {
+    return api.interactions.editReply(i.application_id, i.token, {
       embeds: [
         {
-          title: `/${command.defition().name}`,
-          description: command.defition().description,
+          title: `/${command.definition().name}`,
+          description: command.definition().description,
           color: 0x00ff00,
         },
       ],

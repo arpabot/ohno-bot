@@ -1,4 +1,4 @@
-import {
+import type {
   APIGuildMember,
   GatewayGuildMemberUpdateDispatchData,
   ToEventProps,
@@ -7,12 +7,13 @@ import { members } from "../commons/cache.js";
 
 export default async ({
   data,
-}: ToEventProps<GatewayGuildMemberUpdateDispatchData>) => {
+}: ToEventProps<GatewayGuildMemberUpdateDispatchData>): Promise<void> => {
   const old = members.get(data.guild_id, data.user.id);
 
-  if (!old) return;
+  if (!old) {
+    return;
+  }
 
-  // maybe ok
   members.set(data.guild_id, data.user.id, {
     ...old,
     ...(data as APIGuildMember),

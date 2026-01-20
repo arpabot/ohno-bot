@@ -1,8 +1,8 @@
 import {
-  GatewayInteractionCreateDispatchData,
+  type GatewayInteractionCreateDispatchData,
   InteractionType,
   MessageFlags,
-  ToEventProps,
+  type ToEventProps,
 } from "@discordjs/core";
 import Help from "../commands/help.js";
 import { validate } from "../commands/helper.js";
@@ -11,29 +11,49 @@ import { commands } from "../commands/index.js";
 export default async ({
   api,
   data,
-}: ToEventProps<GatewayInteractionCreateDispatchData>) => {
+}: ToEventProps<GatewayInteractionCreateDispatchData>): Promise<boolean> => {
   if (data.type === InteractionType.ApplicationCommandAutocomplete) {
-    const command = commands.find((x) => x.defition().name === data.data.name);
+    const command = commands.find(
+      (x) => x.definition().name === data.data.name,
+    );
 
-    command?.autoComplete?.(api, data);
-  } else if (data.type === InteractionType.ApplicationCommand) {
+    command?.autoComplete?.(api, data).catch(console.error);
+
+    return true;
+  }
+
+  if (data.type === InteractionType.ApplicationCommand) {
     const error = await api.interactions
       .defer(data.id, data.token)
       .catch((x) => x as Error);
 
-    if (error) return console.error(error);
-    if (!validate(data)) return false;
+    if (error) {
+      console.error(error);
 
-    const command = commands.find((x) => x.defition().name === data.data.name);
+      return false;
+    }
 
-    if (!command && data.data.name !== "help")
-      return await api.interactions.followUp(data.application_id, data.token, {
+    if (!validate(data)) {
+      return false;
+    }
+
+    const command = commands.find(
+      (x) => x.definition().name === data.data.name,
+    );
+
+    if (!command && data.data.name !== "help") {
+      await api.interactions.followUp(data.application_id, data.token, {
         content: "古いコマンドを参照しています．世界を削除します．",
         flags: MessageFlags.Ephemeral,
       });
 
+      return true;
+    }
+
     try {
-      await (command ?? new Help()).run(api, data);
+      const handler = command ?? new Help();
+
+      await handler.run({ api, interaction: data });
     } catch (e) {
       await api.interactions.followUp(data.application_id, data.token, {
         content: `エラーです． \`\`\`${

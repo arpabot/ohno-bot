@@ -1,9 +1,8 @@
-import {
-  APIMessage,
+import type {
   GatewayMessageCreateDispatchData,
   ToEventProps,
 } from "@discordjs/core";
-import { transmute } from "../commons/functions.js";
+import type { SpeakableMessage } from "../commons/constructSpeakableMessage.js";
 import { roomManager } from "../voice/room.js";
 
 const mimeMap: Record<string, string> = {
@@ -15,25 +14,33 @@ const mimeMap: Record<string, string> = {
 
 export default async ({
   data,
-}: ToEventProps<GatewayMessageCreateDispatchData>) => {
-  if (!data.guild_id) return;
-
-  const room = roomManager.get(data.guild_id);
-
-  if (!room) return;
-  if (!transmute<APIMessage & { guild_id: string }>(data)) return;
-  if (
-    room.textChannelId !== data.channel_id &&
-    room.voiceChannelId !== data.channel_id
-  )
-    return;
-
-  if (data.content === "s") {
-    await room.stop();
+}: ToEventProps<GatewayMessageCreateDispatchData>): Promise<void> => {
+  if (!data.guild_id) {
     return;
   }
 
-  if ([";", "_"].some((x) => data.content.startsWith(x))) return;
+  const room = roomManager.get(data.guild_id);
+
+  if (!room) {
+    return;
+  }
+
+  if (
+    room.textChannelId !== data.channel_id &&
+    room.voiceChannelId !== data.channel_id
+  ) {
+    return;
+  }
+
+  if (data.content === "s") {
+    await room.stop();
+
+    return;
+  }
+
+  if ([";", "_"].some((x) => data.content.startsWith(x))) {
+    return;
+  }
 
   const attachment = data.attachments.at(0);
 
@@ -48,9 +55,17 @@ export default async ({
     }ファイル が添付されました ${data.content ?? ""}`;
   }
 
-  room.speak(data).catch((x) => {
-    if (!(x instanceof Error)) throw x;
+  const message: SpeakableMessage = {
+    content: data.content,
+    guild_id: data.guild_id,
+    author: { id: data.author.id },
+  };
 
-    if (x.message !== "request for lock canceled") throw x;
+  room.speak(message).catch((e) => {
+    if (e instanceof Error && e.message === "request for lock canceled") {
+      return;
+    }
+
+    console.error("messageCreate speak error:", e);
   });
 };

@@ -1,20 +1,17 @@
-import { APIMessage } from "@discordjs/core";
-import { transmute } from "./functions.js";
+export interface SpeakableMessage {
+  content: string;
+  guild_id: string;
+  author: { id: string };
+}
 
 export default function constructSpeakableMessage(
   content: string,
-  user_id: string,
-  guild_id: string,
-) {
-  const message = {
+  userId: string,
+  guildId: string,
+): SpeakableMessage {
+  return {
     content,
-    guild_id: guild_id,
-    author: {
-      id: user_id,
-    },
+    guild_id: guildId,
+    author: { id: userId },
   };
-
-  if (!transmute<APIMessage & { guild_id: string }>(message)) return;
-
-  return message;
 }

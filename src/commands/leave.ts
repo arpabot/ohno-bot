@@ -32,7 +32,7 @@ export default class Leave implements ICommand {
     return api.interactions.editReply(i.application_id, i.token, {
       embeds: [
         {
-          description: `<@${i.member.user.id}> が退出しました`,
+          description: "退出しました",
           color: 0x00ff00,
         },
       ],

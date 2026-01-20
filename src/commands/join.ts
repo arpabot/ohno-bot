@@ -60,7 +60,7 @@ export default class Join implements ICommand {
       return api.interactions.editReply(i.application_id, i.token, {
         embeds: [
           {
-            description: `<@${i.member.user.id}> が接続しました`,
+            description: "接続しました",
             color: 0x00ff00,
           },
         ],

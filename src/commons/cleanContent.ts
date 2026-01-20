@@ -1,124 +1,259 @@
-import { APIMessage } from "@discordjs/core";
-import { channels, members, users } from "./cache.js";
-import { transmute } from "./functions.js";
+import { parse } from "discord-markdown-parser";
+import type { SingleASTNode } from "discord-markdown-parser/dist/simple-markdown/index.js";
+import { channels, guilds } from "./cache.js";
+import type { SpeakableMessage } from "./constructSpeakableMessage.js";
+import { getDisplayName } from "./user.js";
 
-const uriPattern =
-  /(?<scheme>[a-zA-Z]([a-zA-Z0-9+.-])*):(?<hier_part>\/\/((?<userinfo>[a-zA-Z0-9._~-]|%[0-9a-fA-F]{2}|[!$&'()*+,;=]|:)*@)?(?<host>\[(?<ipv6address>(((?<h16_0>([0-9a-fA-F]{1,4})):){6}(?<ls32_0>((?<h16_1>([0-9a-fA-F]{1,4})):(?<h16_2>([0-9a-fA-F]{1,4}))|(?<ipv4address_0>((?<dec_octet_0>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_1>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_2>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_3>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))))))|::((?<h16_3>([0-9a-fA-F]{1,4})):){5}(?<ls32_1>((?<h16_4>([0-9a-fA-F]{1,4})):(?<h16_5>([0-9a-fA-F]{1,4}))|(?<ipv4address_1>((?<dec_octet_4>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_5>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_6>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_7>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))))))|((?<h16_6>([0-9a-fA-F]{1,4})))?::((?<h16_7>([0-9a-fA-F]{1,4})):){4}(?<ls32_2>((?<h16_8>([0-9a-fA-F]{1,4})):(?<h16_9>([0-9a-fA-F]{1,4}))|(?<ipv4address_2>((?<dec_octet_8>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_9>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_10>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_11>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))))))|(((?<h16_10>([0-9a-fA-F]{1,4})):){0,1}(?<h16_11>([0-9a-fA-F]{1,4})))?::((?<h16_12>([0-9a-fA-F]{1,4})):){3}(?<ls32_3>((?<h16_13>([0-9a-fA-F]{1,4})):(?<h16_14>([0-9a-fA-F]{1,4}))|(?<ipv4address_3>((?<dec_octet_12>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_13>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_14>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_15>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))))))|(((?<h16_15>([0-9a-fA-F]{1,4})):){0,2}(?<h16_16>([0-9a-fA-F]{1,4})))?::((?<h16_17>([0-9a-fA-F]{1,4})):){2}(?<ls32_4>((?<h16_18>([0-9a-fA-F]{1,4})):(?<h16_19>([0-9a-fA-F]{1,4}))|(?<ipv4address_4>((?<dec_octet_16>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_17>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_18>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_19>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))))))|(((?<h16_20>([0-9a-fA-F]{1,4})):){0,3}(?<h16_21>([0-9a-fA-F]{1,4})))?::(?<h16_22>([0-9a-fA-F]{1,4})):(?<ls32_5>((?<h16_23>([0-9a-fA-F]{1,4})):(?<h16_24>([0-9a-fA-F]{1,4}))|(?<ipv4address_5>((?<dec_octet_20>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_21>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_22>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_23>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))))))|(((?<h16_25>([0-9a-fA-F]{1,4})):){0,4}(?<h16_26>([0-9a-fA-F]{1,4})))?::(?<ls32_6>((?<h16_27>([0-9a-fA-F]{1,4})):(?<h16_28>([0-9a-fA-F]{1,4}))|(?<ipv4address_6>((?<dec_octet_24>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_25>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_26>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_27>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))))))|(((?<h16_29>([0-9a-fA-F]{1,4})):){0,5}(?<h16_30>([0-9a-fA-F]{1,4})))?::(?<h16_31>([0-9a-fA-F]{1,4}))|(((?<h16_32>([0-9a-fA-F]{1,4})):){0,6}(?<h16_33>([0-9a-fA-F]{1,4})))?::))\]|(?<ipv4address_7>((?<dec_octet_28>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_29>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_30>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))\.(?<dec_octet_31>([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))))|(?<reg_name>([a-zA-Z0-9._~-]|%[0-9a-fA-F]{2}|[!$&'()*+,;=])*))(:(?<port>[0-9]*))?(?<path>(?<path_abempty>(\/(?<segment_path_abempty>((?<pchar_segment_path_abempty>[a-zA-Z0-9._~-]|%[0-9a-fA-F]{2}|[!$&'()*+,;=]|:|@))*))*)|(?<path_absolute>(\/(?<segment_nz_path_absolute>((?<pchar_segment_nz_path_absolute>[a-zA-Z0-9._~-]|%[0-9a-fA-F]{2}|[!$&'()*+,;=]|:|@))+)(\/(?<segment_path_absolute>((?<pchar_segment_path_absolute>[a-zA-Z0-9._~-]|%[0-9a-fA-F]{2}|[!$&'()*+,;=]|:|@))*))+?))|(?<path_noscheme>((?<segment_nz_nc_path_noscheme>[a-zA-Z0-9._~-]|%[0-9a-fA-F]{2}|[!$&'()*+,;=]|@)(\/(?<segment_path_noscheme>((?<pchar_segment_path_noscheme>[a-zA-Z0-9._~-]|%[0-9a-fA-F]{2}|[!$&'()*+,;=]|:|@))*))*))|(?<path_rootless>((?<segment_nz_path_rootless>((?<pchar_segment_nz_path_rootless>[a-zA-Z0-9._~-]|%[0-9a-fA-F]{2}|[!$&'()*+,;=]|:|@))+)(\/(?<segment_path_rootless>((?<pchar_segment_path_rootless>[a-zA-Z0-9._~-]|%[0-9a-fA-F]{2}|[!$&'()*+,;=]|:|@))*))*))|(?:)))(\?(?<query>((?<pchar_query>[a-zA-Z0-9._~-]|%[0-9a-fA-F]{2}|[!$&'()*+,;=]|:|@)|\/|\?)*))?(#(?<fragment>((?<pchar_fragment>[a-zA-Z0-9._~-]|%[0-9a-fA-F]{2}|[!$&'()*+,;=]|:|@)|\/|\?)*))?/g;
-const userPattern = /<@!?(?<id>\d{17,19})>/g;
-const channelPattern = /<#(?<id>\d{17,19})>/g;
-const rolePattern = /<@&(?<id>\d{17,19})>/g;
-const commandPattern = /<\/(?<name>.+):(?<id>\d{17,19})>/g;
-const customEmojiPattern = /<a?:(?<name>[a-zA-Z_0-9]+):(?<id>\d{17,19})>/g;
-const timestampPattern = /<t:(?<timestamp>\d+)(:(?<style>.))?>/g;
-const discordPattern =
-  /https?:\/\/(www\.)?((canary|ptb)\.)?discord(app)?\.com\/channels\/(?<guildId>\d{17,19})\/(?<channelId>\d{17,19})(\/(?<messageId>\d{17,19}))?/g;
-const hyperLinkPattern = new RegExp(
-  `\\[(?<name>[^\\[\\]]+)\\]\\(<?${uriPattern.source}>?\\)`,
-  "g",
-);
-const codeBlockPattern = /```(?<name>[a-zA-Z0-9]+)?((?!```)(.|\n))+```/g;
-const spoilerPattern = /\|\|[^|]+\|\|/g;
+const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
+  timeZone: "Asia/Tokyo",
+  dateStyle: "full",
+  timeStyle: "full",
+});
+
+type ASTNode = SingleASTNode | SingleASTNode[];
+
+interface CleanContext {
+  guildId: string | undefined;
+}
+
+interface DiscordUrl {
+  guildId: string;
+  channelId: string;
+  messageId: string | undefined;
+}
 
 export default function cleanContent(
-  message: APIMessage & { guild_id?: string },
+  message: SpeakableMessage & { guild_id?: string },
 ): string {
-  return message.content
-    .replaceAll(
-      codeBlockPattern,
-      generateReplacer(({ name }) => `${name}のコードブロック`, "", ""),
-    )
-    .replaceAll(spoilerPattern, "スポイラー")
-    .replaceAll(
-      hyperLinkPattern,
-      generateReplacer(({ name }) => `${name} カッコ ハイパーリンク`, "", ""),
-    )
-    .replaceAll(discordPattern, (...args: unknown[]) => {
-      const groups = args.at(-1);
+  const ast = parse(message.content, "extended");
+  const ctx: CleanContext = { guildId: message.guild_id };
+  const cleaned = astToText(ast, ctx);
 
-      if (
-        !transmute<{ guildId: string; channelId: string; messageId?: string }>(
-          groups,
-        )
-      )
-        return "";
-
-      const channel = channels.get(groups.channelId);
-      const channelName = channel ? `#${channel.name}` : "不明なチャンネル";
-
-      return message.guild_id === groups.guildId
-        ? groups.messageId
-          ? `${channelName}のメッセージ`
-          : channelName
-        : groups.messageId
-          ? "外部サーバーのメッセージ"
-          : "外部サーバーのチャンネル";
-    })
-    .replaceAll(uriPattern, (...args: unknown[]) => {
-      const groups = args.at(-1);
-
-      if (!transmute<UriPatternGroup>(groups)) return "";
-
-      if (groups.scheme !== "https" && groups.scheme !== "http")
-        return `${groups.scheme}へのリンク`;
-
-      if (groups.ipv6address) return "IPv6 アドレスへのリンク";
-
-      return `${groups.host.replace(/^www\./, "")}のリンク`;
-    })
-    .replaceAll(
-      userPattern,
-      generateReplacer(({ id }) => {
-        const member = members.get(message.guild_id || "", id);
-
-        if (member?.nick) return member.nick;
-
-        const user = users.get(id);
-
-        return user?.global_name || user?.username;
-      }, "不明なユーザー"),
-    )
-    .replaceAll(
-      channelPattern,
-      generateReplacer(({ id }) => {
-        const channel = channels.get(id);
-        return channel?.name;
-      }, "不明なチャンネル"),
-    )
-    .replaceAll(rolePattern, "")
-    .replaceAll(
-      commandPattern,
-      generateReplacer(({ name }) => `スラッシュ${name}`, ""),
-    )
-    .replaceAll(
-      customEmojiPattern,
-      generateReplacer(({ name }) => name, "", ""),
-    )
-    .replaceAll(
-      timestampPattern,
-      generateReplacer((_) => null, "タイムスタンプ"),
-    )
-    .slice(0, 200);
+  return cleaned.slice(0, 200);
 }
 
-function generateReplacer(
-  converter: (groups: { id: string; name: string }) =>
-    | string
-    | null
-    | undefined,
-  fallback: string,
-  prefix = "@",
-) {
-  return (...args: unknown[]) => {
-    const groups = args.at(-1);
-
-    if (!transmute<{ id: string; name: string }>(groups)) return "";
-
-    return `${prefix}${converter(groups) || fallback}`;
-  };
+function getNodeProp(node: SingleASTNode, key: string): unknown {
+  return node[key];
 }
 
-interface UriPatternGroup {
-  host: string;
-  scheme: string;
-  ipv6address?: string;
+function astToText(ast: ASTNode, ctx: CleanContext): string {
+  if (Array.isArray(ast)) {
+    return ast
+      .map((node) => astToText(node, ctx))
+      .filter((text) => text.length > 0)
+      .join(" ");
+  }
+
+  const node = ast;
+
+  switch (node.type) {
+    case "link":
+    case "blockQuote":
+    case "em":
+    case "strong":
+    case "underline":
+    case "strikethrough":
+      return astToText(getContent(node), ctx);
+
+    case "text":
+    case "escape":
+    case "inlineCode":
+      return getString(getNodeProp(node, "content"));
+
+    case "url":
+    case "autolink": {
+      const target = getString(getNodeProp(node, "target"));
+      const discordUrl = parseDiscordUrl(target);
+
+      if (!discordUrl) {
+        return "URL省略";
+      }
+
+      if (ctx.guildId !== discordUrl.guildId) {
+        return `外部サーバーの${discordUrl.messageId ? "メッセージ" : "チャンネル"}`;
+      }
+
+      const channel = channels.get(discordUrl.channelId);
+
+      if (!channel) {
+        return `不明な${discordUrl.messageId ? "メッセージ" : "チャンネル"}`;
+      }
+
+      const name = channel.name ?? "不明なチャンネル";
+
+      return discordUrl.messageId ? `${name}のメッセージ` : name;
+    }
+
+    case "spoiler":
+      return "伏字";
+
+    case "newline":
+    case "br":
+      return "\n";
+
+    case "codeBlock": {
+      const lang = getString(getNodeProp(node, "lang"));
+
+      return lang ? `${lang}のコードブロック` : "コードブロック";
+    }
+
+    case "user": {
+      const id = getString(getNodeProp(node, "id"));
+
+      return getDisplayName(ctx.guildId ?? "", id);
+    }
+
+    case "channel": {
+      const id = getString(getNodeProp(node, "id"));
+      const channel = channels.get(id);
+
+      return channel?.name ?? "不明なチャンネル";
+    }
+
+    case "role": {
+      const id = getString(getNodeProp(node, "id"));
+      const guild = guilds.get(ctx.guildId ?? "");
+      const role = guild?.roles.find((r) => r.id === id);
+
+      return role?.name ?? "不明なロール";
+    }
+
+    case "emoji":
+      return getString(getNodeProp(node, "name"));
+
+    case "slashCommand": {
+      const name = getString(getNodeProp(node, "name"));
+      return `${name}コマンド`;
+    }
+
+    case "twemoji":
+      return getString(getNodeProp(node, "name"));
+
+    case "time": {
+      const timestamp = getString(getNodeProp(node, "timestamp"));
+
+      return formatTimestamp(timestamp);
+    }
+
+    default:
+      return "";
+  }
+}
+
+function getContent(node: SingleASTNode): ASTNode {
+  const content = getNodeProp(node, "content");
+
+  if (Array.isArray(content)) {
+    return content.filter(isSingleASTNode);
+  }
+
+  if (isSingleASTNode(content)) {
+    return content;
+  }
+
+  return [];
+}
+
+function isSingleASTNode(value: unknown): value is SingleASTNode {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "type" in value &&
+    typeof (value as Record<string, unknown>)["type"] === "string"
+  );
+}
+
+function getString(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function parseDiscordUrl(url: string): DiscordUrl | undefined {
+  try {
+    const { protocol, host, pathname } = new URL(url);
+
+    if (protocol !== "https:") return undefined;
+
+    const hosts = [
+      "discord.com",
+      "ptb.discord.com",
+      "canary.discord.com",
+      "discordapp.com",
+      "ptb.discordapp.com",
+      "canary.discordapp.com",
+    ];
+
+    if (!hosts.includes(host)) return undefined;
+
+    const [, channelsPath, guildId, channelId, messageId] = pathname.split("/");
+
+    if (channelsPath !== "channels" || !guildId || !channelId) return undefined;
+
+    return { guildId, channelId, messageId };
+  } catch {
+    return undefined;
+  }
+}
+
+function formatTimestamp(timestamp: string): string {
+  const date = Number(timestamp) * 1000;
+  if (!Number.isInteger(date) || Math.abs(date) > 8640000000000000) {
+    return "不明な日付";
+  }
+
+  try {
+    const segments = getDateSegments(date);
+    const nowSegments = getDateSegments(Date.now());
+
+    for (let i = 0; i < segments.length; i++) {
+      if (segments[i] !== nowSegments[i]) {
+        return segments.slice(i).join("");
+      }
+    }
+    return "今";
+  } catch {
+    return "不明な日付";
+  }
+}
+
+function getDateSegments(date: number): string[] {
+  const segments = dateFormatter
+    .formatToParts(date)
+    .reduce<string[]>((acc, { type, value }) => {
+      switch (type) {
+        case "year":
+        case "month":
+        case "day":
+        case "hour":
+        case "minute":
+        case "second": {
+          const val = Number(value);
+
+          acc.push(Number.isNaN(val) ? value : `${val}`);
+
+          break;
+        }
+
+        case "weekday":
+        case "literal":
+          if (acc.length === 0) {
+            acc.push(value);
+          } else {
+            const lastIdx = acc.length - 1;
+
+            acc[lastIdx] = (acc[lastIdx] ?? "") + value;
+          }
+
+          break;
+      }
+
+      return acc;
+    }, []);
+
+  if (segments.length > 0) {
+    const lastIdx = segments.length - 1;
+
+    segments[lastIdx] = (segments[lastIdx] ?? "").trimEnd();
+  }
+
+  return segments;
 }

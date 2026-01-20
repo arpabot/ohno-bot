@@ -1,25 +1,8 @@
-import {
-  APIChatInputApplicationCommandInteraction,
-  APIInteraction,
-  APIInteractionGuildMember,
-  InteractionType,
-} from "@discordjs/core";
-import { NonNullableByKey } from "../commons/types.js";
+import { type APIInteraction, InteractionType } from "@discordjs/core";
+import type { GuildInteraction } from "./base.js";
 
-export function validate(
-  i: APIInteraction,
-): i is NonNullableByKey<
-  NonNullableByKey<
-    APIChatInputApplicationCommandInteraction,
-    "guild_id",
-    string
-  >,
-  "member",
-  APIInteractionGuildMember
-> {
-  return !!(
-    i.type === InteractionType.ApplicationCommand &&
-    i.guild_id &&
-    i.member
+export function validate(i: APIInteraction): i is GuildInteraction {
+  return (
+    i.type === InteractionType.ApplicationCommand && !!i.guild_id && !!i.member
   );
 }

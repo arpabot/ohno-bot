@@ -1,19 +1,16 @@
 import { Client, GatewayIntentBits } from "@discordjs/core";
 import { REST } from "@discordjs/rest";
 import { WebSocketManager } from "@discordjs/ws";
-import { PrismaClient } from "@prisma/client";
 import { Mutex } from "async-mutex";
 import "dotenv/config";
+import { env } from "./commons/env.js";
+import { db } from "./db/index.js";
 import handlers from "./handlers/index.js";
 import { roomManager } from "./voice/room.js";
 
-if (!process.env["token"]) {
-  process.exit(1);
-}
-
-const rest = new REST({ version: "10" }).setToken(process.env["token"]);
+const rest = new REST({ version: "10" }).setToken(env.token);
 const gateway = new WebSocketManager({
-  token: process.env["token"],
+  token: env.token,
   intents:
     GatewayIntentBits.Guilds |
     GatewayIntentBits.GuildMembers |
@@ -23,14 +20,14 @@ const gateway = new WebSocketManager({
   rest,
 });
 const client = new Client({ rest, gateway });
-const prisma = new PrismaClient();
 const handleExitLock = new Mutex();
-const handleExit = async () => {
+
+const handleExit = async (): Promise<void> => {
   const release = await handleExitLock.acquire();
+
   try {
-    await Promise.all(
-      [...roomManager.values()].map(async (room) => {
-        await room.destroy();
+    for (const room of roomManager.values()) {
+      try {
         await room.api.channels.createMessage(room.textChannelId, {
           embeds: [
             {
@@ -40,27 +37,23 @@ const handleExit = async () => {
             },
           ],
         });
-        await prisma.connections.upsert({
-          create: {
-            guildId: room.guildId,
-            textChannelId: room.textChannelId,
-            voiceChannelId: room.voiceChannelId,
-          },
-          update: {
-            textChannelId: room.textChannelId,
-            voiceChannelId: room.voiceChannelId,
-          },
-          where: {
-            guildId: room.guildId,
-          },
-        });
-      }),
-    );
-  } finally {
-    release();
-  }
 
-  process.exit(0);
+        await db.connection.upsert({
+          guildId: room.guildId,
+          textChannelId: room.textChannelId,
+          voiceChannelId: room.voiceChannelId,
+        });
+
+        await room.destroy();
+      } catch (e) {
+        console.error("Error during room cleanup:", e);
+      }
+    }
+  } finally {
+    db.close();
+    release();
+    process.exit(0);
+  }
 };
 
 for (const [event, fn] of Object.entries(handlers)) {
@@ -71,7 +64,6 @@ for (const [event, fn] of Object.entries(handlers)) {
 }
 
 await gateway.connect();
-await prisma.$connect();
 
 process.on("SIGINT", handleExit);
 process.on("SIGTERM", handleExit);
@@ -80,4 +72,4 @@ process.on("uncaughtException", async (e) => {
   await handleExit();
 });
 
-export { gateway, prisma, client };
+export { client, gateway };

@@ -1,37 +1,26 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import {
-  API,
-  APIChatInputApplicationCommandInteraction,
-  APIInteractionGuildMember,
   MessageFlags,
-  RESTPostAPIChatInputApplicationCommandsJSONBody,
+  type RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
-import { NonNullableByKey } from "../commons/types.js";
-import { type ICommand } from "./index.js";
+import type { CommandContext, ICommand } from "./base.js";
 
 export default class Ping implements ICommand {
-  defition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
+  definition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
     return new SlashCommandBuilder()
       .setName("ping")
       .setDescription("Ping Pong")
       .toJSON();
   }
 
-  async run(
-    api: API,
-    i: NonNullableByKey<
-      NonNullableByKey<
-        APIChatInputApplicationCommandInteraction,
-        "guild_id",
-        string
-      >,
-      "member",
-      APIInteractionGuildMember
-    >,
-  ): Promise<unknown> {
-    return await api.interactions.editReply(i.application_id, i.token, {
-      content: "Pong!",
-      flags: MessageFlags.Ephemeral,
-    });
+  async run(ctx: CommandContext): Promise<unknown> {
+    return ctx.api.interactions.editReply(
+      ctx.interaction.application_id,
+      ctx.interaction.token,
+      {
+        content: "Pong!",
+        flags: MessageFlags.Ephemeral,
+      },
+    );
   }
 }

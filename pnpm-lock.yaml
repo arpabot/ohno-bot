@@ -59,8 +59,8 @@ devDependencies:
     specifier: ^1.8.4
     version: 1.8.4
   libsodium-wrappers:
-    specifier: ^0.7.15
-    version: 0.7.15
+    specifier: ^0.8.0
+    version: 0.8.1
   prism-media:
     specifier: 1.3.5
     version: 1.3.5(@discordjs/opus@0.9.0)
@@ -1496,14 +1496,14 @@ packages:
       lefthook-windows-x64: 1.8.4
     dev: true
 
-  /libsodium-wrappers@0.7.15:
-    resolution: {integrity: sha512-E4anqJQwcfiC6+Yrl01C1m8p99wEhLmJSs0VQqST66SbQXXBoaJY0pF4BNjRYa/sOQAxx6lXAaAFIlx+15tXJQ==}
+  /libsodium-wrappers@0.8.1:
+    resolution: {integrity: sha512-UOqD9M4HhAhwEo2foIgnUrpqXCj2VKdndZXM3PZ0zGe++9808TzAFSp4o2mOgPM/DNUnUqncR3G0xqiKDoAQXQ==}
     dependencies:
-      libsodium: 0.7.15
+      libsodium: 0.8.1
     dev: true
 
-  /libsodium@0.7.15:
-    resolution: {integrity: sha512-sZwRknt/tUpE2AwzHq3jEyUU5uvIZHtSssktXq7owd++3CSgn8RGrv6UZJJBpP7+iBghBqe7Z06/2M31rI2NKw==}
+  /libsodium@0.8.1:
+    resolution: {integrity: sha512-V70In9cepY7MMoKyEvnrojqgQN5yQM/8i8kGh4n/IC1g3thA5nonK0d84e0fR86tFOeAQsOdaL5ONuR93ru25A==}
     dev: true
 
   /lodash.camelcase@4.3.0:

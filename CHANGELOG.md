@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/arpabot/ohno-bot/compare/v2.0.0...v2.0.1) (2026-01-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency dotenv to v17 ([#83](https://github.com/arpabot/ohno-bot/issues/83)) ([cb3ddbc](https://github.com/arpabot/ohno-bot/commit/cb3ddbcc0f2faf2d63d1ba7885f4026968fd165b))
+
 ## [2.0.0](https://github.com/arpabot/ohno-bot/compare/v1.2.1...v2.0.0) (2026-01-20)
 
 

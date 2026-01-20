@@ -1,18 +1,14 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import {
-  API,
-  APIChatInputApplicationCommandInteraction,
-  APIInteractionGuildMember,
   MessageFlags,
-  RESTPostAPIChatInputApplicationCommandsJSONBody,
+  type RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "@discordjs/core";
 import { voiceStates } from "../commons/cache.js";
-import { NonNullableByKey } from "../commons/types.js";
 import { roomManager } from "../voice/room.js";
-import { type ICommand } from "./index.js";
+import { type CommandContext, type ICommand, replySuccess } from "./base.js";
 
 export default class Leave implements ICommand {
-  defition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
+  definition(): RESTPostAPIChatInputApplicationCommandsJSONBody {
     return new SlashCommandBuilder()
       .setName("leave")
       .setDescription("ボイスチャンネルから退出します")
@@ -20,25 +16,15 @@ export default class Leave implements ICommand {
       .toJSON();
   }
 
-  async run(
-    api: API,
-    i: NonNullableByKey<
-      NonNullableByKey<
-        APIChatInputApplicationCommandInteraction,
-        "guild_id",
-        string
-      >,
-      "member",
-      APIInteractionGuildMember
-    >,
-  ): Promise<unknown> {
+  async run(ctx: CommandContext): Promise<unknown> {
+    const { api, interaction: i } = ctx;
     const state = voiceStates
       .get(i.guild_id)
       ?.find((x) => x.user_id === i.member.user.id);
     const room = roomManager.get(i.guild_id);
 
-    if (state?.channel_id !== room?.voiceChannelId)
-      return await api.interactions.editReply(i.application_id, i.token, {
+    if (state?.channel_id !== room?.voiceChannelId) {
+      return api.interactions.editReply(i.application_id, i.token, {
         embeds: [
           {
             description:
@@ -48,16 +34,10 @@ export default class Leave implements ICommand {
         ],
         flags: MessageFlags.Ephemeral,
       });
+    }
 
     await room?.destroy();
 
-    return await api.interactions.editReply(i.application_id, i.token, {
-      embeds: [
-        {
-          description: "退出しました",
-          color: 0xff0000,
-        },
-      ],
-    });
+    return replySuccess(ctx, "退出", "退出しました");
   }
 }

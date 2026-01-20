@@ -1,23 +1,27 @@
-import { Readable } from "stream";
-import { API, APIMessage, APIVoiceState } from "@discordjs/core";
+import { Readable } from "node:stream";
+import type { API, APIVoiceState } from "@discordjs/core";
 import {
   AudioPlayerStatus,
   AudioResource,
-  NoSubscriberBehavior,
-  VoiceConnection,
-  VoiceConnectionStatus,
   createAudioPlayer,
   entersState,
   joinVoiceChannel,
+  NoSubscriberBehavior,
+  type VoiceConnection,
+  VoiceConnectionStatus,
 } from "@discordjs/voice";
-import { WebSocketManager } from "@discordjs/ws";
+import type { WebSocketManager } from "@discordjs/ws";
 import { Mutex } from "async-mutex";
 import { opus } from "prism-media";
 import { channels, members, users } from "../commons/cache.js";
 import cleanContent from "../commons/cleanContent.js";
-import constructSpeakableMessage from "../commons/constructSpeakableMessage.js";
-import { __catch, expect } from "../commons/functions.js";
-import { prisma } from "../index.js";
+import { TIMEOUTS } from "../commons/constants.js";
+import constructSpeakableMessage, {
+  type SpeakableMessage,
+} from "../commons/constructSpeakableMessage.js";
+import { BOT_USER_ID, env } from "../commons/env.js";
+import { getDisplayName } from "../commons/user.js";
+import { db } from "../db/index.js";
 import Synthesizer from "../synthesizer/index.js";
 import voiceAdapterCreator from "./voiceAdapterCreator.js";
 
@@ -36,82 +40,91 @@ export default class Room {
     }),
   ) {}
 
-  async connect() {
+  async connect(): Promise<void> {
     this.connection = joinVoiceChannel({
       adapterCreator: voiceAdapterCreator(this.guildId, this.gateway),
       guildId: this.guildId,
       channelId: this.voiceChannelId,
     });
-    this.connection?.subscribe(this.audioPlayer);
 
-    await entersState(this.connection, VoiceConnectionStatus.Ready, 10_000);
+    this.connection.subscribe(this.audioPlayer);
+
+    await entersState(
+      this.connection,
+      VoiceConnectionStatus.Ready,
+      TIMEOUTS.VOICE_CONNECTION,
+    );
 
     roomManager.set(this.guildId, this);
   }
 
-  async destroy() {
+  async destroy(): Promise<void> {
     this.connection?.disconnect();
     this.connection?.destroy();
     this.audioResourceLock.cancel();
     roomManager.delete(this.guildId);
   }
 
-  async speak(message: APIMessage & { guild_id: string }) {
+  async speak(message: SpeakableMessage): Promise<void> {
     const release = await this.audioResourceLock.acquire();
 
     try {
-      const userConfig = await prisma.synthesizer.findFirst({
-        where: { userId: message.author.id },
-      });
-      const dictionaries = await prisma.dictionary.findMany({
-        where: { guildId: message.guild_id },
-      });
+      const userConfig = await db.synthesizer.findByUserId(message.author.id);
+      const dictionaries = await db.dictionary.findByGuildId(message.guild_id);
       const synthesizer = new Synthesizer(
-        expect(process.env["key"]),
-        expect(process.env["endpoint"]),
+        env.azureKey,
+        env.azureEndpoint,
         userConfig?.voice ?? "ja-JP-NanamiNeural",
-        message.author.id,
         userConfig?.pitch ?? 1,
         userConfig?.speed ?? 1,
       );
 
       let content = cleanContent(message);
 
-      for (const dict of dictionaries) {
+      const sortedDictionaries = [...dictionaries].sort(
+        (a, b) => b.word.length - a.word.length,
+      );
+
+      for (const dict of sortedDictionaries) {
         content = content.replaceAll(dict.word, dict.read);
       }
 
+      const stream = await synthesizer.synthesis(content);
       const resource = new AudioResource(
         [],
-        [
-          Readable.fromWeb(await synthesizer.synthesis(content)).pipe(
-            new opus.OggDemuxer(),
-          ),
-        ],
+        [Readable.fromWeb(stream).pipe(new opus.OggDemuxer())],
         {},
         5,
       );
 
       this.audioPlayer.play(resource);
 
-      await entersState(this.audioPlayer, AudioPlayerStatus.Idle, 10_000).catch(
-        () => this.audioPlayer.stop(),
-      );
+      await entersState(
+        this.audioPlayer,
+        AudioPlayerStatus.Idle,
+        TIMEOUTS.AUDIO_PLAYBACK,
+      ).catch(() => this.audioPlayer.stop());
+    } catch (e) {
+      console.error("Speak error:", e);
     } finally {
       release();
     }
   }
 
-  async stop() {
+  async stop(): Promise<void> {
     this.audioResourceLock.cancel();
     this.audioPlayer.stop(true);
-    await entersState(this.audioPlayer, AudioPlayerStatus.Idle, 5_000);
+    await entersState(
+      this.audioPlayer,
+      AudioPlayerStatus.Idle,
+      TIMEOUTS.AUDIO_STOP,
+    );
   }
 
   async handleVoiceStateUpdate(
     oldState: APIVoiceState | undefined,
     newState: APIVoiceState,
-  ) {
+  ): Promise<void> {
     if (newState.member?.user && newState.guild_id) {
       users.set(newState.user_id, newState.member.user);
       members.set(newState.guild_id, newState.user_id, {
@@ -121,35 +134,23 @@ export default class Room {
       });
     }
 
-    if (!newState.guild_id) return;
-    if (
-      newState.user_id ===
-      atob(
-        expect(
-          expect<string | undefined, string>(process.env["token"])
-            .split(".")
-            .at(0),
-        ),
-      )
-    )
+    if (!newState.guild_id) {
       return;
+    }
+
+    if (newState.user_id === BOT_USER_ID) {
+      return;
+    }
 
     if (
       oldState?.channel_id !== this.voiceChannelId &&
       newState.channel_id === this.voiceChannelId
     ) {
       const message = constructSpeakableMessage(
-        `${
-          members.get(newState.guild_id, newState.user_id)?.nick ??
-          users.get(newState.user_id)?.global_name ??
-          users.get(newState.user_id)?.username ??
-          "不明なユーザー"
-        }が入室しました`,
+        `${getDisplayName(newState.guild_id, newState.user_id)}が入室しました`,
         newState.user_id,
         newState.guild_id,
       );
-
-      if (!message) return;
 
       await this.speak(message);
     }
@@ -161,36 +162,22 @@ export default class Room {
       newState.channel_id
     ) {
       const message = constructSpeakableMessage(
-        `${
-          members.get(newState.guild_id, newState.user_id)?.nick ??
-          users.get(newState.user_id)?.global_name ??
-          users.get(newState.user_id)?.username ??
-          "不明なユーザー"
-        }が${
-          channels.get(newState.channel_id ?? "")?.name ?? "不明なチャンネル"
+        `${getDisplayName(newState.guild_id, newState.user_id)}が${
+          channels.get(newState.channel_id)?.name ?? "不明なチャンネル"
         }へ移動しました`,
         newState.user_id,
         newState.guild_id,
       );
-
-      if (!message) return;
 
       await this.speak(message);
     }
 
     if (oldState?.channel_id === this.voiceChannelId && !newState.channel_id) {
       const message = constructSpeakableMessage(
-        `${
-          members.get(newState.guild_id, newState.user_id)?.nick ??
-          users.get(newState.user_id)?.global_name ??
-          users.get(newState.user_id)?.username ??
-          "不明なユーザー"
-        }が退出しました`,
+        `${getDisplayName(newState.guild_id, newState.user_id)}が退出しました`,
         newState.user_id,
         newState.guild_id,
       );
-
-      if (!message) return;
 
       await this.speak(message);
     }
@@ -200,28 +187,25 @@ export default class Room {
       oldState.channel_id === this.voiceChannelId &&
       newState.channel_id === this.voiceChannelId
     ) {
-      let content = "";
+      const changes: string[] = [];
 
-      if (oldState.self_stream !== newState.self_stream)
-        content = `画面共有を${newState.self_stream ? "開始" : "終了"}`;
+      if (oldState.self_stream !== newState.self_stream) {
+        changes.push(`画面共有を${newState.self_stream ? "開始" : "終了"}`);
+      }
 
-      if (oldState.self_video !== newState.self_video)
-        content = `カメラを${newState.self_video ? "オン" : "オフ"}に`;
+      if (oldState.self_video !== newState.self_video) {
+        changes.push(`カメラを${newState.self_video ? "オン" : "オフ"}に`);
+      }
 
-      if (!content) return;
+      if (changes.length === 0) {
+        return;
+      }
 
       const message = constructSpeakableMessage(
-        `${
-          members.get(newState.guild_id, newState.user_id)?.nick ??
-          users.get(newState.user_id)?.global_name ??
-          users.get(newState.user_id)?.username ??
-          "不明なユーザー"
-        }が${content}しました`,
+        `${getDisplayName(newState.guild_id, newState.user_id)}が${changes.join("、")}しました`,
         newState.user_id,
         newState.guild_id,
       );
-
-      if (!message) return;
 
       await this.speak(message);
     }

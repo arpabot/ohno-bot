@@ -1,7 +1,7 @@
-import { GatewayDispatchEvents, ToEventProps } from "@discordjs/core";
+import { GatewayDispatchEvents, type ToEventProps } from "@discordjs/core";
 import guildCreate from "./guildCreate.js";
-import guildMemberUpdate from "./guildMemberUpdate.js";
 import guildMembersChunk from "./guildMembersChunk.js";
+import guildMemberUpdate from "./guildMemberUpdate.js";
 import interactionCreate from "./interactionCreate.js";
 import messageCreate from "./messageCreate.js";
 import ready from "./ready.js";
@@ -10,8 +10,7 @@ import voiceServerUpdate from "./voiceServerUpdate.js";
 import voiceStateUpdate from "./voiceStateUpdate.js";
 
 const handlers: {
-  // fuck.
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  // biome-ignore lint/suspicious/noExplicitAny: ToEventProps requires generic type parameter
   [key in GatewayDispatchEvents]?: (a: ToEventProps<any>) => unknown;
 } = {
   [GatewayDispatchEvents.Ready]: ready,

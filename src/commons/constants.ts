@@ -1,0 +1,5 @@
+export const TIMEOUTS = {
+  VOICE_CONNECTION: 10_000,
+  AUDIO_PLAYBACK: 10_000,
+  AUDIO_STOP: 5_000,
+} as const;

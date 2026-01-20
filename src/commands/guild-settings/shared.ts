@@ -45,6 +45,9 @@ export type SettingKey = (typeof settingKeys)[number];
 interface ToggleSubcommandOptions {
   name: string;
   description: string;
+}
+
+interface ToggleHandlerOptions {
   settingKey: SettingKey;
   label: string;
 }
@@ -72,7 +75,7 @@ export function createToggleSubcommand(
 }
 
 export function createToggleHandler(
-  options: ToggleSubcommandOptions,
+  options: ToggleHandlerOptions,
 ): ISubcommandHandler {
   return {
     async run(ctx: SubcommandContext): Promise<unknown> {

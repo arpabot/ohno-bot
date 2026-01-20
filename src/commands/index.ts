@@ -12,5 +12,3 @@ export const commands: ICommand[] = [
   new UserSettings(),
   new GuildSettings(),
 ];
-
-export type { CommandContext, GuildInteraction, ICommand } from "./base.js";

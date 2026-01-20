@@ -34,7 +34,16 @@ export default async ({
       .catch((x) => x as Error);
 
     if (error) {
-      console.error(error);
+      console.error("Failed to defer interaction:", error);
+
+      if (data.channel.id) {
+        await api.channels
+          .createMessage(data.channel.id, {
+            content:
+              "コマンドの応答に失敗しました。しばらく待ってからもう一度お試しください。",
+          })
+          .catch(console.error);
+      }
 
       return false;
     }

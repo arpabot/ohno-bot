@@ -1,9 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import type {
-  API,
-  APIApplicationCommandAutocompleteInteraction,
-  RESTPostAPIChatInputApplicationCommandsJSONBody,
-} from "@discordjs/core";
+import type { RESTPostAPIChatInputApplicationCommandsJSONBody } from "@discordjs/core";
 import { type ISubcommandHandler, SubcommandGroup } from "../base.js";
 import { dictDeleteHandler, dictDeleteSubcommand } from "./dict/delete.js";
 import { dictListHandler, dictListSubcommand } from "./dict/list.js";
@@ -40,12 +36,5 @@ export default class GuildSettings extends SubcommandGroup {
     }
 
     return builder.toJSON();
-  }
-
-  override async autoComplete(
-    api: API,
-    interaction: APIApplicationCommandAutocompleteInteraction,
-  ): Promise<unknown> {
-    return super.autoComplete(api, interaction);
   }
 }

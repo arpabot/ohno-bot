@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/arpabot/ohno-bot/compare/v2.0.1...v2.1.0) (2026-01-20)
+
+
+### Features
+
+* 読み上げるコンテンツの設定 ([#95](https://github.com/arpabot/ohno-bot/issues/95)) ([87b03db](https://github.com/arpabot/ohno-bot/commit/87b03db8cff6a7a73c6acffb73f89ea140436ff6))
+
 ## [2.0.1](https://github.com/arpabot/ohno-bot/compare/v2.0.0...v2.0.1) (2026-01-20)
 
 

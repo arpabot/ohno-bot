@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.1.1](https://github.com/arpabot/ohno-bot/compare/v2.1.0...v2.1.1) (2026-05-19)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#100](https://github.com/arpabot/ohno-bot/issues/100)) ([a1c9a76](https://github.com/arpabot/ohno-bot/commit/a1c9a76075481c958f5793b456194ce132e1b1c0))
+* **deps:** update all non-major dependencies ([#103](https://github.com/arpabot/ohno-bot/issues/103)) ([add9cfd](https://github.com/arpabot/ohno-bot/commit/add9cfd54fff34cdfa5593c275d1d73fc5249cce))
+* **deps:** update all non-major dependencies ([#104](https://github.com/arpabot/ohno-bot/issues/104)) ([4d255e8](https://github.com/arpabot/ohno-bot/commit/4d255e894a5002454c18ebc955b45600c5b62235))
+
 ## [2.1.0](https://github.com/arpabot/ohno-bot/compare/v2.0.1...v2.1.0) (2026-01-20)
 
 
